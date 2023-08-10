@@ -1,0 +1,6 @@
+TOOL_NAME = "Statements maker"
+BEDS_BASE_URL = "https://api.beds24.com/v2/"
+TOKEN_FILE_KEY = "token"
+REFRESH_TOKEN_FILE_KEY = "refresh_token"
+TOKEN_RES_KEY = "token"
+REFRESH_TOKEN_RES_KEY = "refreshToken"
