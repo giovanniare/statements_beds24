@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font
 from utils import consts
 from beds24.beds_api_handler import BedsHandler
 
@@ -9,6 +10,8 @@ class Window(object):
         self.beds_api = BedsHandler()
         self.invite_code = None
         self.setup_msg = None
+        self.token = None
+        self.refresh_token = None
 
     def set_window_name(self) -> None:
         self.root.title(consts.TOOL_NAME)
@@ -33,9 +36,20 @@ class Window(object):
 
         secundary_window.geometry(screen_size)
 
+    def set_header_title(self) -> None:
+        header = "Margaritas House - Statement Maker"
+        font_size = font.Font(size=20)
+        header_label = tk.Label(self.root, text=header, font=font_size)
+        header_label.pack(padx=20, pady=20)
+
     def create_window(self) -> None:
         self.set_window_name()
         self.set_window_size()
+        self.set_header_title()
+
+        valid_tokens = self.beds_api.check_tokens()
+        if not valid_tokens:
+            self.mostrar_ventana_setup()
 
     def setup_buton(self):
         setup_btn = tk.Button(self.root, text="Set Up", command=self.mostrar_ventana_setup)

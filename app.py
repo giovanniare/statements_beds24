@@ -8,6 +8,5 @@ window = Window(root)
 
 # Create window
 window.create_window()
-window.setup_buton()
 
 root.mainloop()

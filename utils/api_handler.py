@@ -9,8 +9,8 @@ class ApiHandler(object):
         self.requests = requests
         self.logger = Logger()
 
-    def get_request(self, url: str, headers={}):
-        response = self.requests.get(url, headers=headers)
+    def get_request(self, url: str, headers={}, params=None):
+        response = self.requests.get(url, headers=headers, params=params)
 
         file_name = f"{FILE_NAME} - get_request method"
 
