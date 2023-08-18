@@ -21,3 +21,11 @@ README.md
 ```
 
 #### Python proyect
+Important note: Token file is not present in proyect due to project security. Create token file on beds24/ folder and with following structure:
+```
+{
+    "token": null
+    "valid_token": false,
+    "refresh_token": null
+}
+```
