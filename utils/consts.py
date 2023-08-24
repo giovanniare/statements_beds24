@@ -1,5 +1,6 @@
 TOOL_NAME = "Statements maker"
 BEDS_BASE_URL = "https://api.beds24.com/v2/"
+INVITE_CODE_GENERATOR_URL = "https://beds24.com/control3.php?pagetype=apiv2"
 TOKEN_FILE_KEY = "token"
 REFRESH_TOKEN_FILE_KEY = "refresh_token"
 VALID_REFRESH_TOKEN_KEY = "valid_refresh_token"
@@ -7,5 +8,8 @@ VALID_TOKEN_KEY = "valid_token"
 TOKEN_RES_KEY = "token"
 VALID_TOKEN_RES_KEY = "validToken"
 REFRESH_TOKEN_RES_KEY = "refreshToken"
+TOKEN_EXPIRES_IN_KEY = "expiresIn"
+PROPERTY_NAME = "property_name"
+PROPERTY_NUMBER = "property_number"
 
 SUCCESSFUL_RESPONSE = 200

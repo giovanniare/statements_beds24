@@ -96,12 +96,38 @@ class BedsHandler(object):
         self.tools.update_token_status(api_response)
         return api_response
 
-    def check_tokens(self):
+    def check_tokens(self) -> bool:
         token_details = self.get_token_details()
         valid_token = token_details.get(CS.VALID_TOKEN_RES_KEY)
+        expire = token_details.get(CS.TOKEN_EXPIRES_IN_KEY)
+        token_expired = expire is None or expire == 0
 
-        if not valid_token:
+        if not valid_token or token_expired:
             if not self.get_token():
                 return False
 
         return True
+
+    def get_all_properties(self):
+        token = self.tools.get_token()
+        if token is None:
+            return False
+
+        header = {
+            "refreshToken": token,
+            "accept": "application/json",
+            "connection": "Keep-Alive"
+        }
+
+        params = {
+            "includeLanguages": "all",
+            "includeTexts": "all"
+        }
+
+        url = f"{CS.BEDS_BASE_URL}properties"
+        api_response = self.api.get_request(url=url, headers=header, params=params)
+
+        if not api_response or "success" in api_response:
+            return False
+
+        return self.tools.parse_properties_from_beds(api_response)

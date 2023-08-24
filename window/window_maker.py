@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import font
 from utils import consts
+from utils.tools import Tools
 from beds24.beds_api_handler import BedsHandler
 
 
 class Window(object):
     def __init__(self, root) -> None:
         self.root = root
+        self.tools = Tools()
         self.beds_api = BedsHandler()
         self.invite_code = None
         self.setup_msg = None
@@ -28,10 +30,10 @@ class Window(object):
 
         self.root.geometry(screen_size)
 
-    def set_secundary_window_size(self, secundary_window):
+    def set_secundary_window_size(self, secundary_window) -> None:
         screen_height, screen_width = self.get_window_size()
-        xside = int(screen_width/4)
-        yside = int(screen_height/4)
+        xside = int(screen_width/2)
+        yside = int(screen_height/3)
         screen_size = f"{xside}x{yside}"
 
         secundary_window.geometry(screen_size)
@@ -51,14 +53,19 @@ class Window(object):
         if not valid_tokens:
             self.mostrar_ventana_setup()
 
-    def setup_buton(self):
+    def setup_buton(self) -> None:
         setup_btn = tk.Button(self.root, text="Set Up", command=self.mostrar_ventana_setup)
         setup_btn.pack(pady=20)
 
-    def mostrar_ventana_setup(self):
+    def mostrar_ventana_setup(self) -> None:
         ventana_pop = tk.Toplevel(self.root)
         ventana_pop.title("Authentication SetUp")
         self.set_secundary_window_size(ventana_pop)
+        msg = "Para obtener un nuevo invite code, primero tienes que hacer log in en beds, despues haz click en el boton de generar invite code"
+        get_invite_text = tk.Label(ventana_pop, text=msg)
+        get_invite_text.pack(padx=20, pady=20)
+        btn_get_invite = tk.Button(ventana_pop, text="Get Invite Code", command=self.tools.invite_code_link, cursor="hand2")
+        btn_get_invite.pack(pady=10)
 
         instruction = tk.Label(ventana_pop, text="Introduce el invite code")
         instruction.pack(padx=20, pady=20)
@@ -72,12 +79,15 @@ class Window(object):
         btn_send = tk.Button(ventana_pop, text="Send", command=self.call_setup_beds_api)
         btn_send.pack(pady=10)
         btn_exit = tk.Button(ventana_pop, text="Close", command=ventana_pop.destroy)
-        btn_exit.pack(pady=10)
+        btn_exit.pack(side="bottom", pady=10, padx=10, anchor="se")
 
-    def call_setup_beds_api(self):
+    def call_setup_beds_api(self) -> None:
         api_response = self.beds_api.setup(self.invite_code.get())
         msg = "All right, code valid"
         if not api_response:
             msg = "Error, code invalid. Try with another invite code"
 
         self.setup_msg.config(text=msg)
+
+    def make_all_reports(self) -> None:
+        pass
