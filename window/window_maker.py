@@ -90,4 +90,7 @@ class Window(object):
         self.setup_msg.config(text=msg)
 
     def make_all_reports(self) -> None:
-        pass
+        properties = self.beds_api.get_all_properties()
+        self.tools.update_properties_file(properties)
+
+        

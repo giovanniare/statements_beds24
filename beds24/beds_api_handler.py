@@ -99,7 +99,7 @@ class BedsHandler(object):
     def check_tokens(self) -> bool:
         token_details = self.get_token_details()
         valid_token = token_details.get(CS.VALID_TOKEN_RES_KEY)
-        expire = token_details.get(CS.TOKEN_EXPIRES_IN_KEY)
+        expire = token_details["token"].get(CS.TOKEN_EXPIRES_IN_KEY)
         token_expired = expire is None or expire == 0
 
         if not valid_token or token_expired:
@@ -108,13 +108,13 @@ class BedsHandler(object):
 
         return True
 
-    def get_all_properties(self):
+    def get_all_properties(self) -> dict:
         token = self.tools.get_token()
         if token is None:
             return False
 
         header = {
-            "refreshToken": token,
+            "token": token,
             "accept": "application/json",
             "connection": "Keep-Alive"
         }
@@ -126,8 +126,43 @@ class BedsHandler(object):
 
         url = f"{CS.BEDS_BASE_URL}properties"
         api_response = self.api.get_request(url=url, headers=header, params=params)
+        not_success = api_response["success"] == False
 
-        if not api_response or "success" in api_response:
+        if not api_response or not_success:
             return False
 
         return self.tools.parse_properties_from_beds(api_response)
+
+    def get_property_bookings(self, property_id, arrival_from=None, arrival_to=None) -> dict:
+        token = self.tools.get_token()
+        if token is None:
+            return False
+
+        header = {
+            "token": token,
+            "accept": "application/json",
+            "connection": "Keep-Alive"
+        }
+
+        if arrival_from and arrival_to:
+            pass
+        else:
+            year = self.tools.get_current_year()
+            month = self.tools.get_current_month()
+            month_days = self.tools.get_month_range()        
+
+        params = {
+            "propertyId": property_id,
+            "includeGuests": True,
+            "arrivalFrom": f"{year}-{month}-{month_days[0]}",
+            "arrivalTo": f"{year}-{month}-{month_days[1]}"
+        }
+
+        url = f"{CS.BEDS_BASE_URL}bookings"
+        api_response = self.api.get_request(url=url, headers=header, params=params)
+        not_success = api_response["success"] == False
+
+        if not api_response or not_success:
+            return False
+
+        return api_response["data"]

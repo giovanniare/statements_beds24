@@ -8,5 +8,6 @@ window = Window(root)
 
 # Create window
 window.create_window()
+window.make_all_reports()
 
 root.mainloop()

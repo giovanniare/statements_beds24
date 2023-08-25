@@ -2,7 +2,10 @@ import os
 import re
 import json
 import socket
+import calendar
 import webbrowser
+from datetime import datetime
+from collections import OrderedDict
 from utils import consts as CS
 
 
@@ -90,12 +93,12 @@ class Tools(object):
     def invite_code_link(self) -> None:
         webbrowser.open(CS.INVITE_CODE_GENERATOR_URL)
 
-    def parse_properties_from_beds(self, api_response):
+    def parse_properties_from_beds(self, api_response) -> dict:
         properties = api_response.get("data")
         if not properties:
             return None
 
-        data = dict()
+        data = OrderedDict()
 
         for prop in properties:
             property_id = prop["id"]
@@ -117,4 +120,19 @@ class Tools(object):
             data[property_id] = property_info
 
         return data
-            
+
+    def update_properties_file(self, new_property_structure) -> None:
+        with open(self.properties_file_path, "w") as properties_file:
+            json.dump(new_property_structure, properties_file, indent=4)
+
+    def get_current_year(self) -> int:
+        return datetime.now().year
+
+    def get_current_month(self) -> int:
+        return datetime.now().month
+
+    def get_month_range(self) -> tuple:
+        year = self.get_current_year()
+        month = self.get_current_month()
+
+        return calendar.monthrange(year=year, month=month)
