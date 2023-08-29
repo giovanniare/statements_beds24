@@ -47,11 +47,7 @@ class Window(object):
     def create_window(self) -> None:
         self.set_window_name()
         self.set_window_size()
-        self.set_header_title()
-
-        valid_tokens = self.beds_api.check_tokens()
-        if not valid_tokens:
-            self.mostrar_ventana_setup()
+        self.set_header_title()        
 
     def setup_buton(self) -> None:
         setup_btn = tk.Button(self.root, text="Set Up", command=self.mostrar_ventana_setup)
@@ -88,9 +84,3 @@ class Window(object):
             msg = "Error, code invalid. Try with another invite code"
 
         self.setup_msg.config(text=msg)
-
-    def make_all_reports(self) -> None:
-        properties = self.beds_api.get_all_properties()
-        self.tools.update_properties_file(properties)
-
-        

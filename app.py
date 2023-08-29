@@ -1,13 +1,17 @@
 import tkinter as tk
-from window.window_maker import Window
+from handler.app_handler import AppHandler
 
+# Build tkinter
 root = tk.Tk()
 
-# Initalize window maker
-window = Window(root)
+# Call main handler
+app = AppHandler(root)
 
-# Create window
-window.create_window()
-window.make_all_reports()
+# Authentication and data base creation
+app.initialize()
 
+# Build tkinter main window
+app.lauch()
+
+# Tkinter loop
 root.mainloop()

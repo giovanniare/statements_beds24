@@ -136,3 +136,18 @@ class Tools(object):
         month = self.get_current_month()
 
         return calendar.monthrange(year=year, month=month)
+
+    def get_number_of_properties_from_data_base(self):
+        with open(self.properties_file_path, "r") as properties_file:
+            data = json.load(properties_file)
+
+        if not data:
+            return 0
+
+        return len(data)
+
+    def get_full_properties_data(self):
+        with open(self.properties_file_path, "r") as properties_file:
+            data = json.load(properties_file)
+
+        return data

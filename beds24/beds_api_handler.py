@@ -109,6 +109,12 @@ class BedsHandler(object):
         return True
 
     def get_all_properties(self) -> dict:
+        """
+        *****************************************************************************
+        GET /authentication/properties
+        *****************************************************************************
+        This method is the one in charge of get information of all properties in beds24
+        """
         token = self.tools.get_token()
         if token is None:
             return False
@@ -134,6 +140,12 @@ class BedsHandler(object):
         return self.tools.parse_properties_from_beds(api_response)
 
     def get_property_bookings(self, property_id, arrival_from=None, arrival_to=None) -> dict:
+        """
+        *****************************************************************************
+        GET /authentication/bookings
+        *****************************************************************************
+        This method is the one in charge of get all booking information about specific property
+        """
         token = self.tools.get_token()
         if token is None:
             return False
