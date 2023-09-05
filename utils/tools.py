@@ -103,6 +103,8 @@ class Tools(object):
         for prop in properties:
             property_id = prop["id"]
             property_name = prop["name"]
+            property_state = prop["state"]
+            property_country = prop["country"]
 
             results = re.findall(r"\d+|\D+", property_name)
             numbers = [x for x in results if x.isdigit()]
@@ -114,7 +116,9 @@ class Tools(object):
 
             property_info = {
                 CS.PROPERTY_NAME: property_name,
-                CS.PROPERTY_NUMBER: property_num
+                CS.PROPERTY_NUMBER: property_num,
+                CS.COUNTRY: property_country,
+                CS.STATE: property_state
             }
 
             data[property_id] = property_info

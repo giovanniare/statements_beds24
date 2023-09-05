@@ -161,12 +161,14 @@ class BedsHandler(object):
         else:
             year = self.tools.get_current_year()
             month = self.tools.get_current_month()
-            month_days = self.tools.get_month_range()        
+            month_days = self.tools.get_month_range()
 
+        month = f"0{month}" if month < 10 else month
         params = {
             "propertyId": property_id,
             "includeGuests": True,
-            "arrivalFrom": f"{year}-{month}-{month_days[0]}",
+            "includeInvoiceItems": True,
+            "arrivalFrom": f"{year}-{month}-01",
             "arrivalTo": f"{year}-{month}-{month_days[1]}"
         }
 

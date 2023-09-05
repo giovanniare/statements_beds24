@@ -3,6 +3,7 @@ from tkinter import font
 from utils import consts
 from utils.tools import Tools
 from beds24.beds_api_handler import BedsHandler
+from statement_maker.statement_maker import StatementMaker
 
 
 class Window(object):
@@ -10,6 +11,7 @@ class Window(object):
         self.root = root
         self.tools = Tools()
         self.beds_api = BedsHandler()
+        self.statement_maker = StatementMaker()
         self.invite_code = None
         self.setup_msg = None
         self.token = None
@@ -47,7 +49,8 @@ class Window(object):
     def create_window(self) -> None:
         self.set_window_name()
         self.set_window_size()
-        self.set_header_title()        
+        self.set_header_title()
+        self.build_all_statements()        
 
     def setup_buton(self) -> None:
         setup_btn = tk.Button(self.root, text="Set Up", command=self.mostrar_ventana_setup)
@@ -84,3 +87,7 @@ class Window(object):
             msg = "Error, code invalid. Try with another invite code"
 
         self.setup_msg.config(text=msg)
+
+    def build_all_statements(self) -> None:
+        build_all_reports_btn = tk.Button(self.root, text="Build all reports", command=self.statement_maker.make_all_statements)
+        build_all_reports_btn.pack(pady=20)

@@ -1,3 +1,7 @@
+##########################################################################################
+# STR consts
+##########################################################################################
+
 TOOL_NAME = "Statements maker"
 BEDS_BASE_URL = "https://api.beds24.com/v2/"
 INVITE_CODE_GENERATOR_URL = "https://beds24.com/control3.php?pagetype=apiv2"
@@ -11,5 +15,27 @@ REFRESH_TOKEN_RES_KEY = "refreshToken"
 TOKEN_EXPIRES_IN_KEY = "expiresIn"
 PROPERTY_NAME = "property_name"
 PROPERTY_NUMBER = "property_number"
+STATE = "state"
+COUNTRY = "country"
+FL = "FL"
+FLORIDA = "Florida"
+MEXICO = "MX"
+USA = "US"
+QROO = "Quintana Roo"
+CART_TRANSACTION_KEY_1 = "Fee per card transaction 4%"
+CART_TRANSACTION_KEY_2 = "Commission for card collection 4%"
+CLEANING_KEY_1 = "Cleanning fee"
+CLEANING_KEY_2 = "Cleanning"
+RESORT_FEE_KEY_1 = "Resort fee"
+RESORT_FEE_KEY_2 = "resort fee"
+PET_FEE_KEY = "Pet fee"
+
+
+##########################################################################################
+# Numeric consts
+##########################################################################################
 
 SUCCESSFUL_RESPONSE = 200
+AIRBNB_COMMISSION = 0.03
+FL_COMMISSION = 0.15
+TULUM_COMMISSION = 0.10
