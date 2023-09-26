@@ -99,7 +99,8 @@ class BedsHandler(object):
     def check_tokens(self) -> bool:
         token_details = self.get_token_details()
         valid_token = token_details.get(CS.VALID_TOKEN_RES_KEY)
-        expire = token_details["token"].get(CS.TOKEN_EXPIRES_IN_KEY)
+        token_key = token_details.get("token", None)
+        expire = token_key.get(CS.TOKEN_EXPIRES_IN_KEY, None) if token_key is not None else None
         token_expired = expire is None or expire == 0
 
         if not valid_token or token_expired:
@@ -153,24 +154,35 @@ class BedsHandler(object):
         header = {
             "token": token,
             "accept": "application/json",
-            "connection": "Keep-Alive"
+            "connection": "keep-alive"
         }
 
         if arrival_from and arrival_to:
-            pass
+            month_from = f"0{arrival_from.month}" if arrival_from.month < 10 else arrival_from.month
+            month_to = f"0{arrival_to.month}" if arrival_to.month < 10 else arrival_to.month
+            day_from = f"0{arrival_from.day}" if arrival_from.day < 10 else arrival_from.day
+            day_to = f"0{arrival_to.day}" if arrival_to.day < 10 else arrival_to.day
+            params = {
+                "propertyId": property_id,
+                "arrivalFrom": f"{arrival_from.year}-{month_from}-{day_from}",
+                "arrivalTo": f"{arrival_to.year}-{month_to}-{day_to}",
+                "includeGuests": "true",
+                "includeInvoiceItems": "true",
+            }
+            
         else:
             year = self.tools.get_current_year()
             month = self.tools.get_current_month()
             month_days = self.tools.get_month_range()
+            month = f"0{month}" if month < 10 else month
 
-        month = f"0{month}" if month < 10 else month
-        params = {
-            "propertyId": property_id,
-            "includeGuests": True,
-            "includeInvoiceItems": True,
-            "arrivalFrom": f"{year}-{month}-01",
-            "arrivalTo": f"{year}-{month}-{month_days[1]}"
-        }
+            params = {
+                "propertyId": property_id,
+                "arrivalFrom": f"{year}-{month}-01",
+                "arrivalTo": f"{year}-{month}-{month_days[1]}",
+                "includeGuests": "true",
+                "includeInvoiceItems": "true",
+            }
 
         url = f"{CS.BEDS_BASE_URL}bookings"
         api_response = self.api.get_request(url=url, headers=header, params=params)

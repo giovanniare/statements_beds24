@@ -135,9 +135,13 @@ class Tools(object):
     def get_current_month(self) -> int:
         return datetime.now().month
 
-    def get_month_range(self) -> tuple:
-        year = self.get_current_year()
-        month = self.get_current_month()
+    def get_month_range(self, specific_date=None) -> tuple:
+        if specific_date is None:
+            year = self.get_current_year()
+            month = self.get_current_month()
+        else:
+            year = specific_date[1]
+            month = specific_date[0]
 
         return calendar.monthrange(year=year, month=month)
 

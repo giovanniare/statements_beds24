@@ -17,6 +17,12 @@ class StatementMaker(object):
         self.tools = Tools()
         self.logger = Logger()
         self.rules = PropertyRules()
+        self.report_from = None
+        self.report_to = None
+
+    def set_report_dates(self, report_dates):
+        self.report_from = report_dates.From
+        self.report_to = report_dates.To
 
     def build_file(self, property_file_dir, info, contenido):
         statement = SimpleDocTemplate(property_file_dir, pagesize=letter)
@@ -43,12 +49,21 @@ class StatementMaker(object):
         month_range = self.tools.get_month_range()
         month = self.tools.get_current_month()
         year = self.tools.get_current_year()
+        report_from = self.report_from
+        report_to = self.report_to
 
-        date_data = [
-            ["Incomes from:", f"{month}/{month_range[0]}/{year}"],
-            ["Incomes to:", f"{month}/{month_range[1]}/{year}"],
-            ["Date:", f"{month}/{month_range[1] - 1}/{year}"]
-        ]
+        if report_from is None or report_to is None:
+            date_data = [
+                ["Incomes from:", f"{month}/01/{year}"],
+                ["Incomes to:", f"{month}/{month_range[1]}/{year}"],
+                ["Date:", f"{month}/{month_range[1] - 1}/{year}"]
+            ]
+        else:
+            date_data = [
+                ["Incomes from:", f"{report_from.month}/{report_from.day}/{report_from.year}"],
+                ["Incomes to:", f"{report_to.month}/{report_to.day}/{report_to.year}"],
+                ["Date:", f"{month}/{month_range[1] - 1}/{year}"]
+            ]
 
         fecha = Table(
             date_data,
@@ -67,13 +82,13 @@ class StatementMaker(object):
         return statement
 
     def calculate_total_and_line_total(self, invoice_items, price, property_id, property_info) -> tuple:
-        booking_from_beds = False
+        booking_from_beds = True
         income = None
         charges = {}
 
         for item in invoice_items:
             if item["type"] == "payment":
-                booking_from_beds = True
+                booking_from_beds = False
                 income = item["amount"]
                 continue
 
@@ -117,7 +132,10 @@ class StatementMaker(object):
         contenido.append(espacio)
 
     def build_booking_table(self, contenido, property_info, prop_id) -> None:
-        bookings = self.beds_handler.get_property_bookings(prop_id)
+        if self.report_from is None or self.report_to is None:
+            bookings = self.beds_handler.get_property_bookings(prop_id)
+        else:
+            bookings = self.beds_handler.get_property_bookings(prop_id, arrival_from=self.report_from, arrival_to=self.report_to)
         if not bookings:
             return
 
@@ -140,8 +158,17 @@ class StatementMaker(object):
         self.create_statements_folder()
         properties = self.tools.get_full_properties_data()
 
+        if self.report_from is None or self.report_to is None:
+            month = self.tools.get_current_month()
+            year = self.tools.get_current_year()
+            date_path = f"\\statements\\{month}-{year}"
+        else:
+            month = self.report_from.month
+            year = self.report_from.year
+            date_path = f"\\statements\\{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
+
         project_dir = os.getcwd()
-        date_folder_dir = project_dir.join(["", f"\\statements\\{self.tools.get_current_month()}-{self.tools.get_current_year()}"])
+        date_folder_dir = project_dir.join(["", date_path])
 
         for prop_id, info in properties.items():
             file_name = date_folder_dir.join(["", f"\\{info['property_name']}.pdf"])
@@ -165,7 +192,14 @@ class StatementMaker(object):
         except FileExistsError:
             self.logger.printer("statement_maker/create_statements_folder", f"Reports dir: '{statements_dir}' found.")
 
-        date_folder_dir = statements_dir.join(["", f"\\{self.tools.get_current_month()}-{self.tools.get_current_year()}"])
+        if self.report_from is None or self.report_to is None:
+            month = self.tools.get_current_month()
+            year = self.tools.get_current_year()
+            date_path = f"\\{month}-{year}"
+        else:
+            date_path = f"\\{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
+
+        date_folder_dir = statements_dir.join(["", date_path])
 
         try:
             os.mkdir(date_folder_dir)
