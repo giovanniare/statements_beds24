@@ -38,12 +38,12 @@ class StatementMaker(object):
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
-                ("FONTSIZE", (0, 0), (-1, -1), 18),
+                ("FONTSIZE", (0, 0), (-1, -1), 17),
             ],
         )
         contenido.append(franja_azul)
 
-        espacio = Spacer(1, 12)
+        espacio = Spacer(1, 30)
         contenido.append(espacio)
 
         month_range = self.tools.get_month_range()
@@ -54,9 +54,9 @@ class StatementMaker(object):
 
         if report_from is None or report_to is None:
             date_data = [
-                ["Incomes from:", f"{month}/01/{year}"],
-                ["Incomes to:", f"{month}/{month_range[1]}/{year}"],
-                ["Date:", f"{month}/{month_range[1] - 1}/{year}"]
+                ["Incomes from:", f"{month}/01/{year}", ""],
+                ["Incomes to:", f"{month}/{month_range[1]}/{year}", ""],
+                ["Date:", f"{month}/{month_range[1] - 1}/{year}", ""]
             ]
         else:
             date_data = [
@@ -67,16 +67,21 @@ class StatementMaker(object):
 
         fecha = Table(
             date_data,
-            colWidths=[60, 60, 380],
+            colWidths=[100, 75, 285],
             style=[
-                ("LEFTPADDING", (0, 0), (-1, -1), 10),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
             ],
+        )   
+        fecha_table_style = TableStyle(
+            [
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT')
+            ]
         )
+        fecha.setStyle(fecha_table_style)
 
         contenido.append(fecha)
 
-        espacio = Spacer(1, 30)
+        espacio = Spacer(1, 50)
         contenido.append(espacio)
 
         return statement
@@ -93,7 +98,7 @@ class StatementMaker(object):
                 continue
 
             concept = item["description"]
-            if concept == "VAT on Accommodation (Mexico)":
+            if concept in CS.IGNORE_CONCEPT_LIST:
                 continue
 
             charges[concept] = item["amount"]
@@ -104,7 +109,19 @@ class StatementMaker(object):
 
         return total, line_total
 
+    def sort_booking_table(self, booking_table, temporary_table, total_bookings):
+        ordered_booking_table = sorted(temporary_table,
+                                       key=lambda booking: self.tools.convert_str_date_to_datetime(booking[1]))
+
+        for booking in ordered_booking_table:
+            booking_table.append(booking)
+
+        total_rentas_line = ["", "", "", "TOTAL RENTAS", f"$ {total_bookings}"]
+        booking_table.append(total_rentas_line)
+
     def fill_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
+        temporary_booking_table = []
+        total_bookings = 0
         for booking in bookings:
             if booking["status"] == "cancelled":
                 continue
@@ -115,16 +132,34 @@ class StatementMaker(object):
                 f"{booking['firstName']} {booking['lastName']}",
                 booking["arrival"],
                 booking["departure"],
-                total,
-                line_total
+                f"$ {total}",
+                f"$ {line_total}"
             ]
 
-            booking_table_data.append(booking_data)
+            temporary_booking_table.append(booking_data)
+            total_bookings += line_total
+
+        self.sort_booking_table(booking_table_data, temporary_booking_table, total_bookings)
 
     def booking_table(self, contenido, booking_table_data) -> None:
         booking_table = Table(
             booking_table_data,
-            colWidths=[200, 75, 75, 55, 55],
+            colWidths=[180, 60, 60, 75, 85],
+            style=[
+                ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),  # Color de fondo para el encabezado
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Color de texto para el encabezado
+                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Alineación al centro
+                ("VALIGN", (0, 0), (-1, 0), "MIDDLE"),
+                ("FONTSIZE", (0, 0), (-1, 0), 8),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Fuente en negrita para el encabezado
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Espacio inferior para el encabezado
+                ('GRID', (0, 0), (-1, -1), 1, colors.gray),  # Agregar bordes a la tabla
+                ('GRID', (0, 0), (-1, 0), 1, colors.gray),  # Agregar bordes al encabezado
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Alineación a la izquierda
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),  # Fuente para el texto en las celdas
+                ('LEADING', (0, 0), (-1, -1), 14),  # Espaciado entre líneas (interlineado)
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ],
         )
 
         contenido.append(booking_table)
@@ -140,12 +175,13 @@ class StatementMaker(object):
             return
 
         booking_table_data = [
-            ["Description", "From", "To", "Total", "Line Total"]
+            CS.BOOKING_TABLE_HEADER
         ]
 
         listing_not_duplicated = all(prop_id not in duplicate_listing for duplicate_listing in self.rules.duplicate_listing)
         if listing_not_duplicated:
             self.fill_booking_data(bookings, prop_id, property_info, booking_table_data)
+            self.booking_table(contenido, booking_table_data)
             return
 
         for duplicate_listing in self.rules.duplicate_listing:

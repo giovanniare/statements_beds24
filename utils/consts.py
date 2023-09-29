@@ -18,7 +18,10 @@ PROPERTY_NUMBER = "property_number"
 STATE = "state"
 COUNTRY = "country"
 FL = "FL"
-FLORIDA = "Florida"
+FL_L = "fl"
+FLORIDA = "FLORIDA"
+FLORIDA_1 = "Florida"
+FLORIDA_L = "florida"
 MEXICO = "MX"
 USA = "US"
 QROO = "Quintana Roo"
@@ -29,6 +32,8 @@ CLEANING_KEY_2 = "Cleanning"
 RESORT_FEE_KEY_1 = "Resort fee"
 RESORT_FEE_KEY_2 = "resort fee"
 PET_FEE_KEY = "Pet fee"
+ROOM_RATE_DESCRIPTION = "[ROOMNAME1] [FIRSTNIGHT] - [LEAVINGDAY]"
+VAT_MEX = "VAT on Accommodation (Mexico)"
 
 
 ##########################################################################################
@@ -39,3 +44,22 @@ SUCCESSFUL_RESPONSE = 200
 AIRBNB_COMMISSION = 0.03
 FL_COMMISSION = 0.15
 TULUM_COMMISSION = 0.10
+
+
+##########################################################################################
+# Lists consts
+##########################################################################################
+
+BOOKING_TABLE_HEADER = ["Description", "From", "To", "Total", "Line Total"]
+IGNORE_CONCEPT_LIST = [
+    ROOM_RATE_DESCRIPTION,
+    VAT_MEX
+]
+
+FLORIDA_IDS = [
+    FL,
+    FLORIDA,
+    FL_L,
+    FLORIDA_1,
+    FLORIDA_L
+]

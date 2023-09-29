@@ -159,3 +159,6 @@ class Tools(object):
             data = json.load(properties_file)
 
         return data
+
+    def convert_str_date_to_datetime(self, date_str):
+        return datetime.strptime(date_str, "%Y-%m-%d")

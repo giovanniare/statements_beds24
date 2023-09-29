@@ -49,7 +49,7 @@ class PropertyRules(object):
             return total - (total * self.final_commission_map[property_id])
 
         location = property_info[CS.STATE]
-        if location == CS.FL or location == CS.FLORIDA:
+        if location in CS.FLORIDA_IDS:
             return total - (total * CS.FL_COMMISSION)
 
         if location == CS.QROO:
@@ -57,7 +57,7 @@ class PropertyRules(object):
 
     def booking_from_airbnb(self, charges, income) -> int:
         total_charges_amount = 0
-        for des, amount in charges:
+        for _, amount in charges.items():
             total_charges_amount += amount
 
         return income - total_charges_amount
@@ -75,7 +75,7 @@ class PropertyRules(object):
         three_porcent_less = sub_income - (sub_income * CS.AIRBNB_COMMISSION)
 
         total_charges_amount = 0
-        for des, amount in charges:
+        for _, amount in charges.items():
             total_charges_amount += amount
 
         return three_porcent_less - total_charges_amount
