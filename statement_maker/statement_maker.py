@@ -1,9 +1,10 @@
 import os
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import Image
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Table, TableStyle
+from reportlab.pdfgen import canvas
 from beds24.beds_api_handler import BedsHandler
 from utils import consts as CS
 from utils.tools import Tools
@@ -24,9 +25,12 @@ class StatementMaker(object):
         self.report_from = report_dates.From
         self.report_to = report_dates.To
 
-    def build_file(self, property_file_dir, info, contenido):
-        statement = SimpleDocTemplate(property_file_dir, pagesize=letter)
+    def add_item_to_document(self, item, statement, x, y):
+        width, height = letter
+        item.wrap(width, height)
+        item.drawOn(statement, x=x, y=y)
 
+    def build_file(self, info, statement):
         # Franja azul
         franja_azul = Table(
             [[info["property_name"]]],
@@ -41,10 +45,8 @@ class StatementMaker(object):
                 ("FONTSIZE", (0, 0), (-1, -1), 17),
             ],
         )
-        contenido.append(franja_azul)
 
-        espacio = Spacer(1, 30)
-        contenido.append(espacio)
+        self.add_item_to_document(franja_azul, statement, CS.BLUE_LABEL_X, CS.BLUE_LABEL_Y)
 
         month_range = self.tools.get_month_range()
         month = self.tools.get_current_month()
@@ -68,6 +70,7 @@ class StatementMaker(object):
         fecha = Table(
             date_data,
             colWidths=[100, 75, 285],
+            rowHeights=[15, 15, 15],
             style=[
                 ("FONTSIZE", (0, 0), (-1, -1), 8),
             ],
@@ -79,12 +82,15 @@ class StatementMaker(object):
         )
         fecha.setStyle(fecha_table_style)
 
-        contenido.append(fecha)
+        fecha_y = (CS.BLUE_LABEL_Y - sum(fecha._rowHeights)) - CS.GENERIC_SPACE_Y
+        self.add_item_to_document(fecha, statement, CS.BLUE_LABEL_X, fecha_y)
 
-        espacio = Spacer(1, 50)
-        contenido.append(espacio)
+        logo_path = self.tools.get_logo_path()
+        logo = Image(logo_path, width=CS.IMAGE_WIDTH, height=CS.IMAGE_HEIGHT)
 
-        return statement
+        logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
+        logo_x = ((612 - CS.ITEM_X) - CS.IMAGE_WIDTH) - 20
+        self.add_item_to_document(logo, statement, logo_x, logo_y)
 
     def calculate_total_and_line_total(self, invoice_items, price, property_id, property_info) -> tuple:
         booking_from_beds = True
@@ -141,10 +147,12 @@ class StatementMaker(object):
 
         self.sort_booking_table(booking_table_data, temporary_booking_table, total_bookings)
 
-    def booking_table(self, contenido, booking_table_data) -> None:
+    def booking_table(self, statement, booking_table_data) -> None:
+        row_heights = [20 for _ in booking_table_data]
         booking_table = Table(
             booking_table_data,
             colWidths=[180, 60, 60, 75, 85],
+            rowHeights=row_heights,
             style=[
                 ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),  # Color de fondo para el encabezado
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Color de texto para el encabezado
@@ -152,7 +160,6 @@ class StatementMaker(object):
                 ("VALIGN", (0, 0), (-1, 0), "MIDDLE"),
                 ("FONTSIZE", (0, 0), (-1, 0), 8),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Fuente en negrita para el encabezado
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Espacio inferior para el encabezado
                 ('GRID', (0, 0), (-1, -1), 1, colors.gray),  # Agregar bordes a la tabla
                 ('GRID', (0, 0), (-1, 0), 1, colors.gray),  # Agregar bordes al encabezado
                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Alineación a la izquierda
@@ -162,9 +169,9 @@ class StatementMaker(object):
             ],
         )
 
-        contenido.append(booking_table)
-        espacio = Spacer(1, 30)
-        contenido.append(espacio)
+        logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
+        table_y = (logo_y - sum(booking_table._rowHeights)) - 10
+        self.add_item_to_document(booking_table, statement, CS.BLUE_LABEL_X, table_y)
 
     def build_booking_table(self, contenido, property_info, prop_id) -> None:
         if self.report_from is None or self.report_to is None:
@@ -203,23 +210,23 @@ class StatementMaker(object):
             year = self.report_from.year
             date_path = f"\\statements\\{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
 
-        project_dir = os.getcwd()
+        project_dir = self.tools.get_project_path()
         date_folder_dir = project_dir.join(["", date_path])
 
         for prop_id, info in properties.items():
             file_name = date_folder_dir.join(["", f"\\{info['property_name']}.pdf"])
-            contenido = []
-            statement = self.build_file(file_name, info, contenido)
+            statement = canvas.Canvas(file_name, pagesize=letter)
+            self.build_file(info, statement)
 
             listing_duplicated = all(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
             if listing_duplicated:
                 continue
 
-            self.build_booking_table(contenido, info, prop_id)
-            statement.build(contenido)
+            self.build_booking_table(statement, info, prop_id)
+            statement.save()
 
     def create_statements_folder(self) -> None:
-        current_dir = os.getcwd()
+        current_dir = self.tools.get_project_path()
         statements_dir = current_dir.join(["", "\\statements"])
         
         try:

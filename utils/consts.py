@@ -45,6 +45,13 @@ AIRBNB_COMMISSION = 0.03
 FL_COMMISSION = 0.15
 TULUM_COMMISSION = 0.10
 
+IMAGE_HEIGHT = 130
+IMAGE_WIDTH = 130
+BLUE_LABEL_X = 56
+BLUE_LABEL_Y = 712
+ITEM_X = 76
+GENERIC_SPACE_Y = 40
+
 
 ##########################################################################################
 # Lists consts

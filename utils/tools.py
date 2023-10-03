@@ -162,3 +162,11 @@ class Tools(object):
 
     def convert_str_date_to_datetime(self, date_str):
         return datetime.strptime(date_str, "%Y-%m-%d")
+
+    def get_project_path(self):
+        return os.getcwd()
+
+    def get_logo_path(self):
+        project_path = self.get_project_path()
+        logo_path = project_path.join(["", "\\utils\\images\\logo.png"])
+        return logo_path
