@@ -70,3 +70,8 @@ FLORIDA_IDS = [
     FLORIDA_1,
     FLORIDA_L
 ]
+
+INVALID_CHARACTERS = str.maketrans({
+    "\u00b7": "-",
+    "/": "-",
+})

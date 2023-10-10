@@ -1,10 +1,11 @@
+from copy import deepcopy
 import os
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import Image
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Table, TableStyle
 from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle, Image
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.charts.barcharts import VerticalBarChart
 from beds24.beds_api_handler import BedsHandler
 from utils import consts as CS
 from utils.tools import Tools
@@ -29,6 +30,10 @@ class StatementMaker(object):
         width, height = letter
         item.wrap(width, height)
         item.drawOn(statement, x=x, y=y)
+
+    def validate_property_name(self, name):
+        valid_name = name.translate(CS.INVALID_CHARACTERS)
+        return valid_name.strip()
 
     def build_file(self, info, statement):
         # Franja azul
@@ -83,7 +88,7 @@ class StatementMaker(object):
         fecha.setStyle(fecha_table_style)
 
         fecha_y = (CS.BLUE_LABEL_Y - sum(fecha._rowHeights)) - CS.GENERIC_SPACE_Y
-        self.add_item_to_document(fecha, statement, CS.BLUE_LABEL_X, fecha_y)
+        self.add_item_to_document(fecha, statement, CS.ITEM_X, fecha_y)
 
         logo_path = self.tools.get_logo_path()
         logo = Image(logo_path, width=CS.IMAGE_WIDTH, height=CS.IMAGE_HEIGHT)
@@ -122,8 +127,58 @@ class StatementMaker(object):
         for booking in ordered_booking_table:
             booking_table.append(booking)
 
-        total_rentas_line = ["", "", "", "TOTAL RENTAS", f"$ {total_bookings}"]
+        total_rentas_line = ["", "", "", "TOTAL RENTAS", f"$ {round(total_bookings, 2)}"]
         booking_table.append(total_rentas_line)
+
+    def build_bar_chart(self, statement, booking_table):
+        width, height = letter
+        drawing = Drawing(width, height)
+
+        data = [[],[]]
+        names = []
+        for booking in booking_table:
+            if booking == CS.BOOKING_TABLE_HEADER:
+                continue
+
+            if booking[3] == "TOTAL RENTAS":
+                continue
+
+            data[0].append(int(round(float(booking[3][2:-1]), 2)))
+            data[1].append(int(round(float(booking[4][2:-1]), 2)))
+            names.append(booking[0])
+
+        data[0] = tuple(data[0])
+        data[1] = tuple(data[1])
+
+        graphic = VerticalBarChart()
+        graphic.x = 50
+        graphic.y = 50
+        graphic.height = 175
+        graphic.width = 400
+        graphic.data = data
+        graphic.strokeColor = colors.black
+        graphic.bars[0].fillColor = colors.HexColor(0x5B9BD5)
+        graphic.bars[1].fillColor = colors.HexColor(0xFFE699)
+        graphic.groupSpacing = 10
+        graphic.barSpacing = 2.5
+
+        graphic.valueAxis.valueMin = 0
+        graphic.valueAxis.valueMax = max(data[0]) + 100
+
+        graphic.categoryAxis.labels.boxAnchor = 'ne'
+        graphic.categoryAxis.labels.dx = 8
+        graphic.categoryAxis.labels.dy = -2
+        graphic.categoryAxis.labels.angle = 30
+        graphic.categoryAxis.categoryNames = names
+
+        drawing.add(graphic)
+
+        logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
+        table_h = 20 * len(booking_table) if len(booking_table) >= 6 else 100
+        table_y = logo_y - table_h
+        graphic_y = table_y - (table_h / 2) - graphic.height - 10
+
+        self.add_item_to_document(drawing, statement, 60, graphic_y)
 
     def fill_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
         temporary_booking_table = []
@@ -138,8 +193,8 @@ class StatementMaker(object):
                 f"{booking['firstName']} {booking['lastName']}",
                 booking["arrival"],
                 booking["departure"],
-                f"$ {total}",
-                f"$ {line_total}"
+                f"$ {round(total, 2)}",
+                f"$ {round(line_total, 2)}"
             ]
 
             temporary_booking_table.append(booking_data)
@@ -171,7 +226,8 @@ class StatementMaker(object):
 
         logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
         table_y = (logo_y - sum(booking_table._rowHeights)) - 10
-        self.add_item_to_document(booking_table, statement, CS.BLUE_LABEL_X, table_y)
+        self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
+        self.build_bar_chart(statement, booking_table_data)
 
     def build_booking_table(self, contenido, property_info, prop_id) -> None:
         if self.report_from is None or self.report_to is None:
@@ -179,7 +235,7 @@ class StatementMaker(object):
         else:
             bookings = self.beds_handler.get_property_bookings(prop_id, arrival_from=self.report_from, arrival_to=self.report_to)
         if not bookings:
-            return
+            return False
 
         booking_table_data = [
             CS.BOOKING_TABLE_HEADER
@@ -189,13 +245,14 @@ class StatementMaker(object):
         if listing_not_duplicated:
             self.fill_booking_data(bookings, prop_id, property_info, booking_table_data)
             self.booking_table(contenido, booking_table_data)
-            return
+            return True
 
         for duplicate_listing in self.rules.duplicate_listing:
             for listing in duplicate_listing:
                 self.fill_booking_data(bookings, listing, property_info, booking_table_data)
 
         self.booking_table(contenido, booking_table_data)
+        return True
 
     def make_all_statements(self) -> None:
         self.create_statements_folder()
@@ -214,15 +271,18 @@ class StatementMaker(object):
         date_folder_dir = project_dir.join(["", date_path])
 
         for prop_id, info in properties.items():
-            file_name = date_folder_dir.join(["", f"\\{info['property_name']}.pdf"])
-            statement = canvas.Canvas(file_name, pagesize=letter)
-            self.build_file(info, statement)
-
             listing_duplicated = all(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
             if listing_duplicated:
                 continue
 
-            self.build_booking_table(statement, info, prop_id)
+            property_name = self.validate_property_name(info['property_name'])
+            file_name = date_folder_dir.join(["", f"\\{property_name}.pdf"])
+            statement = canvas.Canvas(file_name, pagesize=letter)
+            self.build_file(info, statement)
+
+            if not self.build_booking_table(statement, info, prop_id):
+                continue
+
             statement.save()
 
     def create_statements_folder(self) -> None:

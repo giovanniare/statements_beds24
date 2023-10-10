@@ -31,7 +31,7 @@ class PropertyRules(object):
 
     def get_total(self, charges, income, property_id, booking_from_beds=False) -> int:
         if property_id in self.property_rule_specific_map:
-            return self.property_rule_specific_map[property_id](charges, income, booking_from_beds=False)
+            return self.property_rule_specific_map[property_id](charges, income, booking_from_beds)
 
         if booking_from_beds:
             return self.booking_from_beds(charges, income)
@@ -112,7 +112,7 @@ class PropertyRules(object):
             return self.booking_from_beds(charges, income)
 
         commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_1, None)
-        if not commission_per_card:
+        if commission_per_card is None:
             commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_2, None)
             charges.pop(CS.CART_TRANSACTION_KEY_2)
         else:
