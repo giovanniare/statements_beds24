@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import font, ttk
 from tkcalendar import Calendar
 from collections import namedtuple
 from utils import consts
@@ -70,7 +70,7 @@ class Window(object):
         build_statement_btn.pack(padx=25, pady=20, side="left")
 
         close_btn = tk.Button(self.root, text="Close", command=self.root.destroy)
-        close_btn.pack(side="bottom", pady=20, anchor="center")
+        close_btn.pack(side="bottom", pady=20, anchor="center")    
 
     def setup_buton(self) -> None:
         setup_btn = tk.Button(self.root, text="Set Up", command=self.mostrar_ventana_setup)
@@ -139,8 +139,11 @@ class Window(object):
         window_pop.title("Create statements")
         self.set_secundary_window_size(window_pop)
 
-        build_all_reports_btn = tk.Button(window_pop, text="Build all reports", command=self.statement_maker.make_all_statements)
+        options_frame = tk.Frame(window_pop)
+        options_frame.pack()
+
+        build_all_reports_btn = tk.Button(options_frame, text="Build all reports", command=self.statement_maker.make_all_statements)
         build_all_reports_btn.pack(pady=20)
 
-        close_btn = tk.Button(window_pop, text="Close", command=self.root.destroy)
+        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")

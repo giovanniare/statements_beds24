@@ -180,7 +180,7 @@ class StatementMaker(object):
 
         self.add_item_to_document(drawing, statement, 60, graphic_y)
 
-    def fill_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
+    def get_filled_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
         temporary_booking_table = []
         total_bookings = 0
         for booking in bookings:
@@ -200,7 +200,7 @@ class StatementMaker(object):
             temporary_booking_table.append(booking_data)
             total_bookings += line_total
 
-        self.sort_booking_table(booking_table_data, temporary_booking_table, total_bookings)
+        return temporary_booking_table, total_bookings
 
     def booking_table(self, statement, booking_table_data) -> None:
         row_heights = [20 for _ in booking_table_data]
@@ -229,28 +229,43 @@ class StatementMaker(object):
         self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
         self.build_bar_chart(statement, booking_table_data)
 
-    def build_booking_table(self, contenido, property_info, prop_id) -> None:
+    def booking_data(self, property_info, prop_id, booking_table_data):
         if self.report_from is None or self.report_to is None:
             bookings = self.beds_handler.get_property_bookings(prop_id)
         else:
             bookings = self.beds_handler.get_property_bookings(prop_id, arrival_from=self.report_from, arrival_to=self.report_to)
-        if not bookings:
-            return False
 
+        if not bookings:
+            return None, None
+
+        return self.get_filled_booking_data(bookings, prop_id, property_info, booking_table_data)
+
+    def build_booking_table(self, contenido, property_info, prop_id) -> None:
         booking_table_data = [
             CS.BOOKING_TABLE_HEADER
         ]
 
         listing_not_duplicated = all(prop_id not in duplicate_listing for duplicate_listing in self.rules.duplicate_listing)
         if listing_not_duplicated:
-            self.fill_booking_data(bookings, prop_id, property_info, booking_table_data)
-            self.booking_table(contenido, booking_table_data)
-            return True
+            listings = [prop_id]
+        else:
+            listings = [listings for listings in self.rules.duplicate_listing if prop_id in listings]
 
-        for duplicate_listing in self.rules.duplicate_listing:
-            for listing in duplicate_listing:
-                self.fill_booking_data(bookings, listing, property_info, booking_table_data)
+        temporary_booking_table = []
+        total_bookings = 0
 
+        for p_id in listings:
+            temporary_bookings, total = self.booking_data(property_info, p_id, booking_table_data)
+            if temporary_bookings is None and total is None:
+                continue
+
+            temporary_booking_table.extend(temporary_bookings)
+            total_bookings += total
+
+        if not temporary_booking_table:
+            return False
+            
+        self.sort_booking_table(booking_table_data, temporary_booking_table, total_bookings)
         self.booking_table(contenido, booking_table_data)
         return True
 
@@ -270,8 +285,15 @@ class StatementMaker(object):
         project_dir = self.tools.get_project_path()
         date_folder_dir = project_dir.join(["", date_path])
 
+        # loop, progress_bar, int_bar = self.tools.build_progress_bar(root)
+        # self.tools.inititialize_progress(progress_bar, int_bar)
+        # progress_increment = round(100 / len(properties))
+
         for prop_id, info in properties.items():
-            listing_duplicated = all(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
+            # Increment the value of progress bar indicator
+            # self.tools.update_progress_bar(int_bar, progress_increment)
+
+            listing_duplicated = any(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
             if listing_duplicated:
                 continue
 
@@ -284,6 +306,10 @@ class StatementMaker(object):
                 continue
 
             statement.save()
+
+        # self.tools.finish_progress(loop, progress_bar, int_bar)
+        msg = "All reports were made successfully"
+        self.logger.printer("Statement_maker.make_all_statements()", msg)
 
     def create_statements_folder(self) -> None:
         current_dir = self.tools.get_project_path()

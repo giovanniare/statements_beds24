@@ -4,6 +4,8 @@ import json
 import socket
 import calendar
 import webbrowser
+import tkinter as tk
+from tkinter import ttk
 from datetime import datetime
 from collections import OrderedDict
 from utils import consts as CS
@@ -170,3 +172,32 @@ class Tools(object):
         project_path = self.get_project_path()
         logo_path = project_path.join(["", "\\utils\\images\\logo.png"])
         return logo_path
+
+    def build_progress_bar(self, root):
+        window_pop = tk.Toplevel(root)
+        window_pop.title("Report progress")
+        screen_width = int(root.winfo_screenwidth() / 4)
+        screen_height = int(root.winfo_screenheight() / 3)
+        screen_size = f"{screen_width}x{screen_height}"
+
+        window_pop.geometry(screen_size)
+
+        int_bar = tk.IntVar()
+        progress_bar = ttk.Progressbar(window_pop, variable=int_bar, mode="determinate")
+
+        return window_pop, progress_bar, int_bar
+
+    def update_progress_bar(self, int_bar, progress):
+        current_progress = int_bar.get()
+        if current_progress >= 100:
+            return
+        int_bar.set(current_progress + progress)
+
+    def inititialize_progress(self, progress_bar, int_bar):
+        int_bar.set(0)
+        progress_bar.pack(pady=20)
+
+    def finish_progress(self, loop, progress_bar, int_bar):
+        progress_bar.pack_forget()
+        int_bar.set(0)
+        loop.destroy()

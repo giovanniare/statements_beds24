@@ -18,6 +18,7 @@ class PropertyRules(object):
         ]
         self.final_commission_map = {
             "102507": 0.18,     # 14 - Tulum
+            "207103": 0.18,     # Temozon - Tulum
             "132599": 0.2,      # 15 - Tulum
             "132595": 0.25,     # RB 9 - Tulum
             "143528": 0.25,     # RB 10 - Tulum
@@ -26,7 +27,8 @@ class PropertyRules(object):
         self.duplicate_listing = [
             ("106689", "143362"),
             ("138517", "196293"),
-            ("159372", "185440")
+            ("159372", "185440"),
+            ("191835", "193111")
         ]
 
     def get_total(self, charges, income, property_id, booking_from_beds=False) -> int:
@@ -54,6 +56,8 @@ class PropertyRules(object):
 
         if location == CS.QROO:
             return total - (total * CS.TULUM_COMMISSION)
+
+        return total
 
     def booking_from_airbnb(self, charges, income) -> int:
         total_charges_amount = 0
@@ -111,19 +115,7 @@ class PropertyRules(object):
         if booking_from_beds:
             return self.booking_from_beds(charges, income)
 
-        commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_1, None)
-        if commission_per_card is None:
-            commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_2, None)
-            charges.pop(CS.CART_TRANSACTION_KEY_2)
-        else:
-            charges.pop(CS.CART_TRANSACTION_KEY_1)
-
-        sub_income = income - commission_per_card
-        total_charges_amount = 0
-        for des, amount in charges:
-            total_charges_amount += amount
-
-        return sub_income - total_charges_amount
+        return self.booking_from_airbnb(charges, income)
 
     def rule_3208(self, charges, income, booking_from_beds=False) -> int:
         """
