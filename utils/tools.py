@@ -74,7 +74,7 @@ class Tools(object):
         with open(self.token_file_path, "w") as token_file:
             json.dump(data, token_file)
 
-        return ""
+        return None
 
     def update_token_from_refresh(self, api_response) -> None:
         with open(self.token_file_path, "r") as token_file:

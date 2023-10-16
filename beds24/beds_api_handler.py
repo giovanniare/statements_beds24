@@ -98,6 +98,9 @@ class BedsHandler(object):
 
     def check_tokens(self) -> bool:
         token_details = self.get_token_details()
+        if not token_details:
+            return False
+
         valid_token = token_details.get(CS.VALID_TOKEN_RES_KEY)
         token_key = token_details.get("token", None)
         expire = token_key.get(CS.TOKEN_EXPIRES_IN_KEY, None) if token_key is not None else None
