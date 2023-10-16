@@ -57,11 +57,24 @@ class Tools(object):
         return refresh_token
 
     def get_token(self) -> str:
-        with open(self.token_file_path, "r") as token_file:
-            data = json.load(token_file)
+        if os.path.exists(self.token_file_path):
 
-        token = data[CS.TOKEN_FILE_KEY]
-        return token
+            with open(self.token_file_path, "r") as token_file:
+                data = json.load(token_file)
+
+            token = data[CS.TOKEN_FILE_KEY]
+            return token
+
+        data = {
+            "token": None,
+            "valid_token": None,
+            "refresh_token": None
+        }
+
+        with open(self.token_file_path, "w") as token_file:
+            json.dump(data, token_file)
+
+        return None
 
     def update_token_from_refresh(self, api_response) -> None:
         with open(self.token_file_path, "r") as token_file:
