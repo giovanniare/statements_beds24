@@ -102,9 +102,11 @@ class Window(object):
 
     def call_setup_beds_api(self) -> None:
         api_response = self.beds_api.setup(self.invite_code.get())
-        msg = "All right, code valid"
-        if not api_response:
-            msg = "Error, code invalid. Try with another invite code"
+        msg = "Error, code invalid. Try with another invite code"
+
+        if api_response:
+            self.beds_api.get_all_properties()
+            msg = "All right, code valid"
 
         self.setup_msg.config(text=msg)
 
