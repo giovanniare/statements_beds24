@@ -66,7 +66,7 @@ class Window(object):
         build_all_statements_btn = tk.Button(options_frame, text="Make all Statements", command=self.build_all_statements)
         build_all_statements_btn.pack(padx=25, pady=20, side="left")
 
-        build_statement_btn = tk.Button(options_frame, text="Make Statement", command=self.build_all_statements)
+        build_statement_btn = tk.Button(options_frame, text="Make Statement", command=self.build_single_statement)
         build_statement_btn.pack(padx=25, pady=20, side="left")
 
         close_btn = tk.Button(self.root, text="Close", command=self.root.destroy)
@@ -146,6 +146,29 @@ class Window(object):
 
         build_all_reports_btn = tk.Button(options_frame, text="Build all reports", command=self.statement_maker.make_all_statements)
         build_all_reports_btn.pack(pady=20)
+
+        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
+        close_btn.pack(side="bottom", pady=20, anchor="center")
+
+    def build_single_statement(self) -> None:
+        window_pop = tk.Toplevel(self.root)
+        window_pop.title("Create single statement")
+        self.set_secundary_window_size(window_pop)
+
+        main_win_frame = tk.Frame(window_pop)
+        main_win_frame.pack()
+
+        sorted_list = self.tools.get_sorted_property_items()
+        option_menu = tk.StringVar()
+
+        menu_button = ttk.Menubutton(main_win_frame, text="Pick one property")
+
+        drop_down_menu = tk.Menu(main_win_frame, tearoff=0)
+        for item in sorted_list:
+            drop_down_menu.add_radiobutton(label=item.name, value=item.id_, variable="TBD")
+
+        menu_button["menu"] = drop_down_menu
+        menu_button.pack(expand=True)
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")

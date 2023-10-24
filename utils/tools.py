@@ -7,7 +7,7 @@ import webbrowser
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from utils import consts as CS
 
 
@@ -130,7 +130,7 @@ class Tools(object):
                 property_num = numbers[0]
 
             property_info = {
-                CS.PROPERTY_NAME: property_name,
+                CS.PROPERTY_NAME: property_name.strip(),
                 CS.PROPERTY_NUMBER: property_num,
                 CS.COUNTRY: property_country,
                 CS.STATE: property_state
@@ -174,6 +174,22 @@ class Tools(object):
             data = json.load(properties_file)
 
         return data
+
+    def get_sorted_property_items(self):
+        reverse_property_tuple = namedtuple("menu_item", ["name", "id_"])
+        properties = self.get_full_properties_data()
+        reverse_property_dict = {}
+        property_list = []
+
+        for id_, data in properties.items():
+            reverse_property_dict[data["property_name"]] = id_
+
+        sorted_dict = sorted(reverse_property_dict)
+        for name in sorted_dict:
+            menu_item = reverse_property_tuple(name, reverse_property_dict[name])
+            property_list.append(menu_item)
+
+        return property_list
 
     def convert_str_date_to_datetime(self, date_str):
         return datetime.strptime(date_str, "%Y-%m-%d")
