@@ -4,7 +4,7 @@ from tkcalendar import Calendar
 from collections import namedtuple
 from utils import consts
 from utils.logger import Logger
-from utils.tools import Tools
+from utils.tools import Tools, StringVar
 from beds24.beds_api_handler import BedsHandler
 from statement_maker.statement_maker import StatementMaker
 
@@ -148,7 +148,7 @@ class Window(object):
         build_all_reports_btn.pack(pady=20)
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
-        close_btn.pack(side="bottom", pady=20, anchor="center")
+        close_btn.pack(side="bottom", pady=20, anchor="center")   
 
     def build_single_statement(self) -> None:
         window_pop = tk.Toplevel(self.root)
@@ -159,16 +159,20 @@ class Window(object):
         main_win_frame.pack()
 
         sorted_list = self.tools.get_sorted_property_items()
-        option_menu = tk.StringVar()
 
         menu_button = ttk.Menubutton(main_win_frame, text="Pick one property")
+        name_selected = StringVar()
 
         drop_down_menu = tk.Menu(main_win_frame, tearoff=0)
         for item in sorted_list:
-            drop_down_menu.add_radiobutton(label=item.name, value=item.id_, variable="TBD")
+            drop_down_menu.add_radiobutton(label=item.name, value=item, variable=name_selected)
 
+        name_selected.trace("w", lambda *args: menu_button.config(text=name_selected.get().name))
         menu_button["menu"] = drop_down_menu
-        menu_button.pack(expand=True)
+        menu_button.pack(pady=(10, 0), expand=True)
+
+        build_statement_btn = tk.Button(main_win_frame, text="Create report")
+        build_statement_btn.pack(pady=20)
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")

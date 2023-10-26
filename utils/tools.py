@@ -11,6 +11,36 @@ from collections import OrderedDict, namedtuple
 from utils import consts as CS
 
 
+reverse_property_tuple = namedtuple("menu_item", ["name", "id_"])
+
+
+class StringVar(tk.Variable):
+    """Value holder for strings variables."""
+    _default = ""
+
+    def __init__(self, master=None, value=None, name=None):
+        """Construct a string variable.
+
+        MASTER can be given as master widget.
+        VALUE is an optional value (defaults to "")
+        NAME is an optional Tcl name (defaults to PY_VARnum).
+
+        If NAME matches an existing variable and VALUE is omitted
+        then the existing value is retained.
+        """
+        tk.Variable.__init__(self, master, value, name)
+
+    def get(self):
+        """Return value of variable as string."""
+        value = self._tk.globalgetvar(self._name)
+        value_list = value.split("}")
+        name = value_list[0].replace("}", "")
+        name = name.replace("{", "")
+        id_ = value_list[1].strip()
+
+        return reverse_property_tuple(name.strip(), id_)
+
+
 class Tools(object):
     def __init__(self) -> None:
         self.token_file_path = os.path.join(os.path.dirname(__file__), '..', 'beds24', 'token.json')
@@ -176,7 +206,6 @@ class Tools(object):
         return data
 
     def get_sorted_property_items(self):
-        reverse_property_tuple = namedtuple("menu_item", ["name", "id_"])
         properties = self.get_full_properties_data()
         reverse_property_dict = {}
         property_list = []
