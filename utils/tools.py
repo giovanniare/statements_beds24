@@ -205,6 +205,14 @@ class Tools(object):
 
         return data
 
+    def get_property_info(self, propery_id):
+        with open(self.properties_file_path, "r") as properties_file:
+            data = json.load(properties_file)
+
+        if propery_id not in data:
+            return None
+        return data[propery_id]
+
     def get_sorted_property_items(self):
         properties = self.get_full_properties_data()
         reverse_property_dict = {}

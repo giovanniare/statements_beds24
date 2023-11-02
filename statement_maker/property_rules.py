@@ -11,24 +11,28 @@ class PropertyRules(object):
             "188838": self.rule_2238,
             "143166": self.rule_3208,
             "143362": self.rule_4560,
-            "106689": self.rule_4560
+            "106689": self.rule_4560,
+            "170806": self.rule_4601
         }
         self.final_commission_exempt = [
-            "107103"
+            "107103",           # 19 - Tulum
+            "207103"            # Temozon
         ]
         self.final_commission_map = {
             "102507": 0.18,     # 14 - Tulum
-            "207103": 0.18,     # Temozon - Tulum
             "132599": 0.2,      # 15 - Tulum
             "132595": 0.25,     # RB 9 - Tulum
             "143528": 0.25,     # RB 10 - Tulum
             "180972": 0.25,     # RB 4 - Tulum
+            "208492": 0.22      # Aldea Zama
         }
         self.duplicate_listing = [
-            ("106689", "143362"),
-            ("138517", "196293"),
-            ("159372", "185440"),
-            ("191835", "193111")
+            ("106689", "143362"),   # 4560
+            ("138517", "196293"),   # 1555
+            ("159372", "185440"),   # 8919
+            ("191835", "193111"),   # 8826
+            ("180972", "210004"),   # RB 4
+            ("102507", "207102")    # 14 - Tulum
         ]
 
     def get_total(self, charges, income, property_id, booking_from_beds=False) -> int:
@@ -146,4 +150,12 @@ class PropertyRules(object):
             return self.booking_from_beds(charges, income)
 
         return self.booking_from_airbnb(charges, income)
-            
+
+    def rule_4601(self, charges, income, booking_from_beds=False):
+        if CS.RESORT_FEE_KEY_1 not in charges or CS.RESORT_FEE_KEY_2 not in charges:
+            charges[CS.RESORT_FEE_KEY_1] = 20
+
+        if booking_from_beds:
+            return self.booking_from_beds(charges, income)
+
+        return self.booking_from_airbnb(charges, income)

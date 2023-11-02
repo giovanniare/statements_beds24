@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import font, ttk
 from tkcalendar import Calendar
 from collections import namedtuple
+from beds24.beds_api_handler import BedsHandler
 from utils import consts
+from statement_maker.statement_maker import StatementMaker
+from statement_maker.property_rules import PropertyRules
+from utils.exceptions import NoBookings, NoProperyData
 from utils.logger import Logger
 from utils.tools import Tools, StringVar
-from beds24.beds_api_handler import BedsHandler
-from statement_maker.statement_maker import StatementMaker
 
 
 class Window(object):
@@ -136,6 +138,13 @@ class Window(object):
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack()
 
+    def make_all_statements(self, label):
+        try:
+            self.statement_maker.make_all_statements()
+            label.config(text="All statements were created!!", fg="#27A243")
+        except:
+            label.config(text="Something is wrong, cannot build all staments. An error occurs.", fg="red")        
+
     def build_all_statements(self) -> None:
         window_pop = tk.Toplevel(self.root)
         window_pop.title("Create statements")
@@ -144,11 +153,27 @@ class Window(object):
         options_frame = tk.Frame(window_pop)
         options_frame.pack()
 
-        build_all_reports_btn = tk.Button(options_frame, text="Build all reports", command=self.statement_maker.make_all_statements)
+        result_label = tk.Label(options_frame, text="")
+        build_all_reports_btn = tk.Button(options_frame, text="Build all reports", command=lambda: self.make_all_statements(result_label))
         build_all_reports_btn.pack(pady=20)
+        result_label.pack(side="bottom", pady=(70, 10), anchor="center")
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
-        close_btn.pack(side="bottom", pady=20, anchor="center")   
+        close_btn.pack(side="bottom", pady=20, anchor="center")
+
+    def make_single_statement(self, label, prop_data):
+        try:
+            data = prop_data.get()
+            self.statement_maker.make_single_statement(data.id_)
+            label.config(text=f"{data.name} was created", fg="#27A243")
+        except NoBookings as e:
+            label.config(text=f"{data.name} was not created: {e.message}", fg="orange")
+        except NoProperyData as e:
+            label.config(text=f"{data.name} was not created: {e.message}", fg="red")
+        except IndexError:
+            label.config(text="Please select one property before hit the button.", fg="red")
+        except:
+            label.config(text="Something went wrong.. An error occurs", fg="red")
 
     def build_single_statement(self) -> None:
         window_pop = tk.Toplevel(self.root)
@@ -164,15 +189,22 @@ class Window(object):
         name_selected = StringVar()
 
         drop_down_menu = tk.Menu(main_win_frame, tearoff=0)
+        property_rules = PropertyRules()
+
         for item in sorted_list:
+            listing_duplicated = any(item.id_ == duplicate_listing[1] for duplicate_listing in property_rules.duplicate_listing)
+            if listing_duplicated:
+                continue
             drop_down_menu.add_radiobutton(label=item.name, value=item, variable=name_selected)
 
         name_selected.trace("w", lambda *args: menu_button.config(text=name_selected.get().name))
         menu_button["menu"] = drop_down_menu
         menu_button.pack(pady=(10, 0), expand=True)
 
-        build_statement_btn = tk.Button(main_win_frame, text="Create report")
+        result_label = tk.Label(main_win_frame, text="")
+        build_statement_btn = tk.Button(main_win_frame, text="Create report", command=lambda: self.make_single_statement(result_label, name_selected))
         build_statement_btn.pack(pady=20)
+        result_label.pack(side="bottom", pady=(70, 10), anchor="center")
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")

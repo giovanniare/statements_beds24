@@ -1,16 +1,17 @@
 from copy import deepcopy
 import os
+from beds24.beds_api_handler import BedsHandler
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, TableStyle, Image
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
-from beds24.beds_api_handler import BedsHandler
+from statement_maker.property_rules import PropertyRules
 from utils import consts as CS
+from utils.exceptions import NoBookings, NoProperyData
 from utils.tools import Tools
 from utils.logger import Logger
-from statement_maker.property_rules import PropertyRules
 
 
 class StatementMaker(object):
@@ -269,10 +270,7 @@ class StatementMaker(object):
         self.booking_table(contenido, booking_table_data)
         return True
 
-    def make_all_statements(self) -> None:
-        self.create_statements_folder()
-        properties = self.tools.get_full_properties_data()
-
+    def get_date_folder_dir(self):
         if self.report_from is None or self.report_to is None:
             month = self.tools.get_current_month()
             year = self.tools.get_current_year()
@@ -285,27 +283,48 @@ class StatementMaker(object):
         project_dir = self.tools.get_project_path()
         date_folder_dir = project_dir.join(["", date_path])
 
-        # loop, progress_bar, int_bar = self.tools.build_progress_bar(root)
-        # self.tools.inititialize_progress(progress_bar, int_bar)
-        # progress_increment = round(100 / len(properties))
+        return date_folder_dir
+
+    def create_property_statement(self, prop_id, info, date_folder_dir):
+        listing_duplicated = any(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
+        if listing_duplicated:
+            return
+
+        property_name = self.validate_property_name(info['property_name'])
+        file_name = date_folder_dir.join(["", f"\\{property_name}.pdf"])
+        statement = canvas.Canvas(file_name, pagesize=letter)
+        self.build_file(info, statement)
+
+        if not self.build_booking_table(statement, info, prop_id):
+            raise NoBookings
+
+        statement.save()
+
+    def make_single_statement(self, propery_id):
+        self.create_statements_folder()
+        date_folder_dir = self.get_date_folder_dir()
+        property_info = self.tools.get_property_info(propery_id)
+
+        if property_info is None:
+            msg = f"Propery id {propery_id} is not found"
+            self.logger.printer("Statement_maker.make_single_statement()", msg)
+            raise NoProperyData
+
+        self.create_property_statement(propery_id, property_info, date_folder_dir)
+
+        msg = f"{propery_id} - {property_info['property_name']} was made successfuly"
+        self.logger.printer("Statement_maker.make_single_statement()", msg)
+
+    def make_all_statements(self) -> None:
+        self.create_statements_folder()
+        date_folder_dir = self.get_date_folder_dir()
+        properties = self.tools.get_full_properties_data()
 
         for prop_id, info in properties.items():
-            # Increment the value of progress bar indicator
-            # self.tools.update_progress_bar(int_bar, progress_increment)
-
-            listing_duplicated = any(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
-            if listing_duplicated:
-                continue
-
-            property_name = self.validate_property_name(info['property_name'])
-            file_name = date_folder_dir.join(["", f"\\{property_name}.pdf"])
-            statement = canvas.Canvas(file_name, pagesize=letter)
-            self.build_file(info, statement)
-
-            if not self.build_booking_table(statement, info, prop_id):
-                continue
-
-            statement.save()
+            try:
+                self.create_property_statement(prop_id, info, date_folder_dir)  
+            except NoBookings:
+                continue          
 
         # self.tools.finish_progress(loop, progress_bar, int_bar)
         msg = "All reports were made successfully"
