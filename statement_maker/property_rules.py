@@ -9,10 +9,7 @@ class PropertyRules(object):
             "143528": self.rule_rb_10_9_4,
             "180972": self.rule_rb_10_9_4,
             "188838": self.rule_2238,
-            "143166": self.rule_3208,
-            "143362": self.rule_4560,
-            "106689": self.rule_4560,
-            "170806": self.rule_4601
+            "143166": self.rule_3208
         }
         self.final_commission_exempt = [
             "107103",           # 19 - Tulum
