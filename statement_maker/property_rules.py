@@ -29,7 +29,8 @@ class PropertyRules(object):
             ("159372", "185440"),   # 8919
             ("191835", "193111"),   # 8826
             ("180972", "210004"),   # RB 4
-            ("102507", "207102")    # 14 - Tulum
+            ("102507", "207102"),   # 14 - Tulum
+            ("196291", "143528")    # RB 10
         ]
 
     def get_total(self, charges, income, property_id, booking_from_beds=False) -> int:
