@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import font, ttk
 from tkcalendar import Calendar
 from collections import namedtuple
-from beds24.beds_api_handler import BedsHandler
-from utils import consts
+from oauthlib.oauth2.rfc6749.errors import InvalidClientError
+from app_api_handlers.beds_api_handler import BedsHandler
+from app_api_handlers.xero_api_handler import XeroHandler
 from statement_maker.statement_maker import StatementMaker
 from statement_maker.property_rules import PropertyRules
-from utils.exceptions import NoBookings, NoProperyData
+from utils import consts as CS
+from utils.exceptions import NoBookings, NoProperyData, NoRequestResponse, NonSuccessfulRequest
 from utils.logger import Logger
 from utils.tools import Tools, StringVar
 
@@ -17,6 +19,7 @@ class Window(object):
         self.tools = Tools()
         self.logger = Logger()
         self.beds_api = BedsHandler()
+        self.xero_api = XeroHandler()
         self.statement_maker = StatementMaker()
         self.invite_code = None
         self.setup_msg = None
@@ -24,7 +27,7 @@ class Window(object):
         self.refresh_token = None
 
     def set_window_name(self) -> None:
-        self.root.title(consts.TOOL_NAME)
+        self.root.title(CS.TOOL_NAME)
 
     def get_window_size(self) -> tuple:
         screen_width = self.root.winfo_screenwidth()
@@ -70,6 +73,9 @@ class Window(object):
 
         build_statement_btn = tk.Button(options_frame, text="Make Statement", command=self.build_single_statement)
         build_statement_btn.pack(padx=25, pady=20, side="left")
+
+        xero_btn = tk.Button(options_frame, text="Xero", command=self.start_xero_process)
+        xero_btn.pack(padx=25, pady=20, side="left")
 
         close_btn = tk.Button(self.root, text="Close", command=self.root.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")    
@@ -165,7 +171,7 @@ class Window(object):
         try:
             data = prop_data.get()
             self.statement_maker.make_single_statement(data.id_)
-            label.config(text=f"{data.name} was created", fg="#27A243")
+            label.config(text=f"{data.name} was created", fg=CS.PASS_COLOR)
         except NoBookings as e:
             label.config(text=f"{data.name} was not created: {e.message}", fg="orange")
         except NoProperyData as e:
@@ -208,3 +214,90 @@ class Window(object):
 
         close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
         close_btn.pack(side="bottom", pady=20, anchor="center")
+
+
+##########################################################################################################################################################################
+# XERO
+##########################################################################################################################################################################
+
+    def save_client_data(self, window, client_id, client_secret, result_msg):
+        xero_client_tuple = namedtuple("xero_client", ["client_id", "client_secret"])
+        id_ = client_id.get()
+        secret = client_secret.get()
+
+        if not id_ or not secret:
+            result_msg.config(text="Please provide Cliend ID and Client secret.", fg="orange")
+            return
+
+        try:
+            xero_client = xero_client_tuple(id_, secret)
+            self.xero_api.xero_oauth2(xero_client)
+            self.logger.printer("window_maker.save_client_data()", "Client credentials saved.")
+
+            window.destroy()
+            self.xero_main_view()
+        except InvalidClientError as e:
+            result_msg.config(text=f"Invalid credentials: {e}", fg="red")
+        except NonSuccessfulRequest as e:
+            result_msg.config(text=e.message, fg="red")
+        except NoRequestResponse as e:
+            result_msg.config(text=e.message, fg="red")
+
+    def xero_authenticate(self):
+        window_pop = tk.Toplevel(self.root)
+        window_pop.title("Xero authentication")
+        self.set_secundary_window_size(window_pop)
+
+        main_win_frame = tk.Frame(window_pop)
+        main_win_frame.pack()
+
+        result_label = tk.Label(main_win_frame, text="")
+
+        client_id_label = tk.Label(main_win_frame, text="Client ID")
+        client_id_label.pack(pady=20)
+
+        client_id_entry = tk.Entry(main_win_frame)
+        client_id_entry.pack()
+
+        client_secret_label = tk.Label(main_win_frame, text="Client Secret")
+        client_secret_label.pack(pady=20)
+
+        client_secret_entry = tk.Entry(main_win_frame)
+        client_secret_entry.pack()
+
+        save_data_btn = tk.Button(main_win_frame, text="Save", command=lambda: self.save_client_data(window_pop, client_id_entry, client_secret_entry, result_label))
+        save_data_btn.pack(pady=20)
+
+        result_label.pack(side="bottom", pady=(40, 10), anchor="center")
+
+        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
+        close_btn.pack(side="bottom", pady=20, anchor="center")
+
+    def xero_main_view(self):
+        window_pop = tk.Toplevel(self.root)
+        window_pop.title("Xero")
+        self.set_secundary_window_size(window_pop)
+
+        main_win_frame = tk.Frame(window_pop)
+        main_win_frame.pack()
+
+        load_file_btn = tk.Button(main_win_frame, text="Load file", command="TBD")
+        load_file_btn.pack(padx=25, pady=20, side="left")
+
+        upload_charges_btn = tk.Button(main_win_frame, text="Upload charges", command="TBD")
+        upload_charges_btn.pack(padx=25, pady=20, side="left")
+
+        configure_btn = tk.Button(main_win_frame, text="Set Up", command=self.xero_api.xero_oauth2)
+        configure_btn.pack(padx=25, pady=20, side="left")
+
+        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
+        close_btn.pack(side="bottom", pady=20, anchor="center")
+
+    def start_xero_process(self):
+        xero_client = self.tools.get_xero_client()
+        if xero_client.client_id is None or xero_client.client_secret is None:
+            self.xero_authenticate()
+        else:
+            self.xero_main_view()
+        
+

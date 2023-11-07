@@ -1,14 +1,10 @@
+from app_api_handlers.generic_handler import GenericHandler
 from utils import consts as CS
-from utils.api_handler import ApiHandler
-from utils.tools import Tools
-from utils.logger import Logger
 
 
-class BedsHandler(object):
+class BedsHandler(GenericHandler):
     def __init__(self) -> None:
-        self.api = ApiHandler()
-        self.tools = Tools()
-        self.logger = Logger()
+        super().__init__()
         self.invite_code = None
 
     def setup(self, invite_code) -> bool:

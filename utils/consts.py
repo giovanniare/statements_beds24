@@ -35,6 +35,21 @@ PET_FEE_KEY = "Pet fee"
 ROOM_RATE_DESCRIPTION = "[ROOMNAME1] [FIRSTNIGHT] - [LEAVINGDAY]"
 VAT_MEX = "VAT on Accommodation (Mexico)"
 
+XERO_BASE_URL = "https://api.xero.com/"
+XERO_CONNECT_URL = "https://api.xero.com/connections"
+XERO_AUTH_URL = "https://login.xero.com/identity/connect/authorize"
+XERO_ACCESS_TOKEN_URL = "https://identity.xero.com/connect/token"
+XERO_REDIRECT_URL = "https://myapp.com"
+XERO_SCOPE = "offline_access accounting.transactions openid profile email accounting.contacts accounting.settings"
+XERO_STATE = "123"
+XERO_TOKEN_FILE = {
+    "client_id": None,
+    "client_secret": None,
+    "token": None,
+    "refresh_token": None
+}
+
+PASS_COLOR = "#27A243"
 
 ##########################################################################################
 # Numeric consts

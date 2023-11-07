@@ -12,6 +12,7 @@ from utils import consts as CS
 
 
 reverse_property_tuple = namedtuple("menu_item", ["name", "id_"])
+xero_client_tuple = namedtuple("xero_client", ["client_id", "client_secret"])
 
 
 class StringVar(tk.Variable):
@@ -43,8 +44,9 @@ class StringVar(tk.Variable):
 
 class Tools(object):
     def __init__(self) -> None:
-        self.token_file_path = os.path.join(os.path.dirname(__file__), '..', 'beds24', 'token.json')
-        self.properties_file_path = os.path.join(os.path.dirname(__file__), '..', 'beds24', 'properties.json')
+        self.token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'token.json')
+        self.xero_token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'xero_token.json')
+        self.properties_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'properties.json')
 
     def get_device_name(self) -> str:
         try:
@@ -267,3 +269,14 @@ class Tools(object):
         progress_bar.pack_forget()
         int_bar.set(0)
         loop.destroy()
+
+    def create_xero_token_file(self):
+         with open(self.xero_token_file_path, 'w') as token_file:
+            json.dump(CS.XERO_TOKEN_FILE, token_file, indent=4)
+
+    def get_xero_client(self):
+        with open(self.xero_token_file_path, 'r') as token_file:
+            data = json.load(token_file)
+
+        xero_client = xero_client_tuple(data["client_id"], data["client_secret"])
+        return xero_client

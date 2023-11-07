@@ -1,6 +1,6 @@
 from copy import deepcopy
 import os
-from beds24.beds_api_handler import BedsHandler
+from app_api_handlers.beds_api_handler import BedsHandler
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas

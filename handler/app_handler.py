@@ -1,4 +1,4 @@
-from beds24.beds_api_handler import BedsHandler
+from app_api_handlers.beds_api_handler import BedsHandler
 from utils.tools import Tools
 from window.window_maker import Window
 
