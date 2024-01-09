@@ -8,18 +8,25 @@ class AppHandler(object):
         self.window = Window(root)
         self.beds_api = BedsHandler()
         self.tools = Tools()
+        self.need_invite_code = None
 
     def initialize(self) -> None:
         valid_tokens = self.beds_api.check_tokens()
         if not valid_tokens:
-            self.window.mostrar_ventana_setup()
+            self.need_invite_code = True
+            return
 
-        properties = self.beds_api.get_all_properties()
-        self.tools.update_properties_file(properties)
+        self.build_property_file()        
 
     def lauch(self) -> None:
-        self.window.create_window()
+        if not self.need_invite_code:
+            self.window.main_screen()
+            return
 
-    def test_function(self):
-        pass
+        self.window.setup_screen()
+        if self.window.invite_code.get():
+            self.need_invite_code = False
 
+    def build_property_file(self):
+        properties = self.beds_api.get_all_properties()
+        self.tools.update_properties_file(properties)

@@ -4,34 +4,75 @@ from utils import consts as CS
 class PropertyRules(object):
     def __init__(self) -> None:
         self.tools = Tools()
-        self.property_rule_specific_map = {
-            "132595": self.rule_rb_10_9_4,
-            "143528": self.rule_rb_10_9_4,
-            "180972": self.rule_rb_10_9_4,
-            "188838": self.rule_2238,
-            "143166": self.rule_3208
-        }
-        self.final_commission_exempt = [
-            "107103",           # 19 - Tulum
-            "207103"            # Temozon
-        ]
-        self.final_commission_map = {
-            "102507": 0.18,     # 14 - Tulum
-            "132599": 0.2,      # 15 - Tulum
-            "132595": 0.25,     # RB 9 - Tulum
-            "143528": 0.25,     # RB 10 - Tulum
-            "180972": 0.25,     # RB 4 - Tulum
-            "208492": 0.22      # Aldea Zama
-        }
-        self.duplicate_listing = [
-            ("106689", "143362"),   # 4560
-            ("138517", "196293"),   # 1555
-            ("159372", "185440"),   # 8919
-            ("191835", "193111"),   # 8826
-            ("180972", "210004"),   # RB 4
-            ("102507", "207102"),   # 14 - Tulum
-            ("196291", "143528")    # RB 10
-        ]
+        self.duplicate_listing = self.tools.get_duplicate_properties()
+        self.property_rule_specific_map = self.set_rule_specific_mapping()
+        self.final_commission_exempt = self.properties_without_final_commission()
+        self.final_commission_map = self.properties_final_commission()
+
+    def set_rule_specific_mapping(self):
+        properties = self.tools.get_full_properties_data()
+        rule_specific_map = {}
+
+        for id_, data in properties.items():
+            p_num = data[CS.PROPERTY_NUMBER]
+            if p_num in ["10", "9", "4"]:
+               rule = self.rule_rb_10_9_4
+
+            elif p_num in ["2238"]:
+                rule = self.rule_2238
+
+            elif p_num in ["3208"]:
+                rule = self.rule_3208
+            else:
+                continue
+
+            rule_specific_map[id_] = rule
+
+        return rule_specific_map
+
+    def properties_without_final_commission(self):
+        properties = self.tools.get_full_properties_data()
+        final_commission_exempt = []
+
+        for id_, data in properties.items():
+            p_num = data[CS.PROPERTY_NUMBER]
+            name = data[CS.PROPERTY_NAME]
+
+            if p_num in ["10", "19"] or "Temozon" in name:
+                final_commission_exempt.append(id_)
+
+        return final_commission_exempt
+
+    def properties_final_commission(self):
+        properties = self.tools.get_full_properties_data()
+        final_commission = {}
+
+        for id_, data in properties.items():
+            p_num = data[CS.PROPERTY_NUMBER]
+            name = data[CS.PROPERTY_NAME]
+
+            # 25% de comision
+            if p_num in ["9", "4"]:
+                comsion = 0.25
+
+            # 22% de comision
+            elif "Amaru" in name:
+                comsion = 0.22
+
+            # 20% de comision
+            elif p_num in ["15"]:
+                comsion = 0.2
+
+            # 18% de comision
+            elif p_num in ["14"]:
+                comsion = 0.18
+
+            else:
+                continue
+
+            final_commission[id_] = comsion
+
+        return final_commission
 
     def get_total(self, charges, income, property_id, booking_from_beds=False) -> int:
         if property_id in self.property_rule_specific_map:

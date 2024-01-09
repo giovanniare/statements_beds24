@@ -286,7 +286,9 @@ class StatementMaker(object):
         return date_folder_dir
 
     def create_property_statement(self, prop_id, info, date_folder_dir):
-        listing_duplicated = any(prop_id == duplicate_listing[1] for duplicate_listing in self.rules.duplicate_listing)
+        duplicated = any(prop_id in duplicate_listing for duplicate_listing in self.rules.duplicate_listing)
+        valid_id = all(prop_id != duplicate_listing[0] for duplicate_listing in self.rules.duplicate_listing)
+        listing_duplicated = duplicated and valid_id
         if listing_duplicated:
             return
 

@@ -207,6 +207,23 @@ class Tools(object):
 
         return data
 
+    def get_duplicate_properties(self):
+        properties = self.get_full_properties_data()
+
+        duplicated_dict = {}
+        for id_, data in properties.items():
+
+            property_number = data[CS.PROPERTY_NUMBER]
+
+            if property_number not in duplicated_dict:
+                duplicated_dict[property_number] = [id_]
+                continue
+
+            duplicated_dict[property_number].append(id_)
+
+        duplicate_listing = [tuple(id_list) for id_list in duplicated_dict.values() if len(id_list) > 1]
+        return duplicate_listing
+
     def get_property_info(self, propery_id):
         with open(self.properties_file_path, "r") as properties_file:
             data = json.load(properties_file)
