@@ -35,39 +35,15 @@
         "country": "US",
         "state": "FL"
     },
-    "143166": {
-        "property_name": "3208 \u00b7 Marvel &  Mickey Mouse in West Lucaya!!!",
-        "property_number": "3208",
-        "country": "US",
-        "state": "FL"
-    },
-    "143359": {
-        "property_name": "2603 \u00b7 Cinderella & Friends In Seven Dwarfs",
-        "property_number": "2603",
-        "country": "US",
-        "state": "FL"
-    },
     "143528": {
         "property_name": "RB 10 \u00b7 Divine And Unique Apartment in Tulum / WiFI 150 MB",
         "property_number": "10",
         "country": "MX",
         "state": "Quintana Roo"
     },
-    "159372": {
-        "property_name": "8919 - Baby Yoda and Harry Potter in Hogwarts Castle",
-        "property_number": "8919",
-        "country": "US",
-        "state": "FL"
-    },
     "170694": {
         "property_name": "8805 \u00b7 Beautiful Place in Legacy Dunes 12 Min From Disney",
         "property_number": "8805",
-        "country": "US",
-        "state": "FL"
-    },
-    "170806": {
-        "property_name": "4601 \u00b7 Jurassic & Moana the seven Dwarfs",
-        "property_number": "4601",
         "country": "US",
         "state": "FL"
     },
@@ -106,12 +82,6 @@
         "property_number": "14",
         "country": "MX",
         "state": "Quintana Roo"
-    },
-    "207103": {
-        "property_name": "Monee - Exclusive Studio in Temozon",
-        "property_number": null,
-        "country": "MX",
-        "state": "Yucatan"
     },
     "208492": {
         "property_name": "Amaru - Exclusive Studio in Aldea Zama",

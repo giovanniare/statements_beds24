@@ -38,7 +38,7 @@ class PropertyRules(object):
             p_num = data[CS.PROPERTY_NUMBER]
             name = data[CS.PROPERTY_NAME]
 
-            if p_num in ["10", "19"] or "Temozon" in name:
+            if p_num in ["19"] or "Temozon" in name:
                 final_commission_exempt.append(id_)
 
         return final_commission_exempt
@@ -52,7 +52,7 @@ class PropertyRules(object):
             name = data[CS.PROPERTY_NAME]
 
             # 25% de comision
-            if p_num in ["9", "4"]:
+            if p_num in ["9", "4", "10"]:
                 comsion = 0.25
 
             # 22% de comision

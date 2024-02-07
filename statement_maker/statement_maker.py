@@ -247,10 +247,14 @@ class StatementMaker(object):
         ]
 
         listing_not_duplicated = all(prop_id not in duplicate_listing for duplicate_listing in self.rules.duplicate_listing)
+        listings = []
         if listing_not_duplicated:
-            listings = [prop_id]
+            listings.append(prop_id)
         else:
-            listings = [listings for listings in self.rules.duplicate_listing if prop_id in listings]
+            for d_listings in self.rules.duplicate_listing:
+                if prop_id not in d_listings:
+                    continue
+                listings = d_listings
 
         temporary_booking_table = []
         total_bookings = 0
