@@ -140,6 +140,9 @@ class Tools(object):
     def invite_code_link(self) -> None:
         webbrowser.open(CS.INVITE_CODE_GENERATOR_URL)
 
+    def xero_ids_code(self) -> None:
+        webbrowser.open(CS.XERO_IDS_URL)
+
     def parse_properties_from_beds(self, api_response) -> dict:
         properties = api_response.get("data")
         if not properties:

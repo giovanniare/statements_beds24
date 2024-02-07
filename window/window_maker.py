@@ -4,7 +4,7 @@ from tkcalendar import Calendar
 from collections import namedtuple
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
 from app_api_handlers.beds_api_handler import BedsHandler
-from app_api_handlers.xero_api_handler import XeroHandler
+from xero.xero_api import XeroApi
 from statement_maker.statement_maker import StatementMaker
 from statement_maker.property_rules import PropertyRules
 from utils import consts as CS
@@ -19,7 +19,7 @@ class Window(object):
         self.tools = Tools()
         self.logger = Logger()
         self.beds_api = BedsHandler()
-        self.xero_api = XeroHandler()
+        self.xero_api = XeroApi()
         self.statement_maker = StatementMaker()
         self.invite_code = None
         self.setup_msg = None
@@ -283,7 +283,7 @@ class Window(object):
 
         try:
             xero_client = xero_client_tuple(id_, secret)
-            self.xero_api.xero_oauth2(xero_client)
+            self.xero_api.oauth2(xero_client)
             self.logger.printer("window_maker.save_client_data()", "Client credentials saved.")
 
             window.destroy()
@@ -296,11 +296,12 @@ class Window(object):
             result_msg.config(text=e.message, fg="red")
 
     def xero_authenticate(self):
-        window_pop = tk.Toplevel(self.root)
-        window_pop.title("Xero authentication")
-        self.set_secundary_window_size(window_pop)
+        self.view.pack_forget()
+        window = tk.Frame(self.root)
+        window.pack(expand=True, fill="both")
+        self.view = window
 
-        main_win_frame = tk.Frame(window_pop)
+        main_win_frame = tk.Frame(window)
         main_win_frame.pack()
 
         result_label = tk.Label(main_win_frame, text="")
@@ -317,20 +318,22 @@ class Window(object):
         client_secret_entry = tk.Entry(main_win_frame)
         client_secret_entry.pack()
 
-        save_data_btn = tk.Button(main_win_frame, text="Save", command=lambda: self.save_client_data(window_pop, client_id_entry, client_secret_entry, result_label))
+        save_data_btn = tk.Button(main_win_frame, text="Save", command=lambda: self.save_client_data(window, client_id_entry, client_secret_entry, result_label))
         save_data_btn.pack(pady=20)
 
-        result_label.pack(side="bottom", pady=(40, 10), anchor="center")
+        link_btn = tk.Button(main_win_frame, text="Get IDs", command=lambda: self.tools.xero_ids_code, cursor="hand2")
+        link_btn.pack(pady=20)
 
-        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
-        close_btn.pack(side="bottom", pady=20, anchor="center")
+        result_label.pack(side="bottom", pady=(40, 10), anchor="center")
+        self.basic_btn_frame(window)
 
     def xero_main_view(self):
-        window_pop = tk.Toplevel(self.root)
-        window_pop.title("Xero")
-        self.set_secundary_window_size(window_pop)
+        self.view.pack_forget()
+        window = tk.Frame(self.root)
+        window.pack(expand=True, fill="both")
+        self.view = window
 
-        main_win_frame = tk.Frame(window_pop)
+        main_win_frame = tk.Frame(window)
         main_win_frame.pack()
 
         load_file_btn = tk.Button(main_win_frame, text="Load file", command="TBD")
@@ -342,8 +345,7 @@ class Window(object):
         configure_btn = tk.Button(main_win_frame, text="Set Up", command=self.xero_api.xero_oauth2)
         configure_btn.pack(padx=25, pady=20, side="left")
 
-        close_btn = tk.Button(window_pop, text="Close", command=window_pop.destroy)
-        close_btn.pack(side="bottom", pady=20, anchor="center")
+        self.basic_btn_frame(window)
 
     def start_xero_process(self):
         self.view.pack_forget()
