@@ -25,8 +25,8 @@ FLORIDA_L = "florida"
 MEXICO = "MX"
 USA = "US"
 QROO = "Quintana Roo"
-CART_TRANSACTION_KEY_1 = "Fee per card transaction 4%"
-CART_TRANSACTION_KEY_2 = "Commission for card collection 4%"
+CART_TRANSACTION_KEY_1 = "Fee per card transaction 5%"
+CART_TRANSACTION_KEY_2 = "Commission for card collection 5%"
 CLEANING_KEY_1 = "Cleaning fee"
 CLEANING_KEY_2 = "Cleaning"
 RESORT_FEE_KEY_1 = "Resort fee"
@@ -74,6 +74,7 @@ GENERIC_SPACE_Y = 40
 ##########################################################################################
 
 BOOKING_TABLE_HEADER = ["Description", "From", "To", "Total", "Line Total"]
+SUMMARY_TABLE_HEADER = ["Property Name", "Total"]
 IGNORE_CONCEPT_LIST = [
     ROOM_RATE_DESCRIPTION,
     VAT_MEX

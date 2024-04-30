@@ -21,3 +21,9 @@ class NonSuccessfulRequest(Exception):
     def __init__(self, message) -> None:
         self.message = message
         super().__init__(self.message)
+
+
+class UnexpectedError(Exception):
+    def __init__(self, error_list) -> None:
+        self.errors = error_list
+        super().__init__()

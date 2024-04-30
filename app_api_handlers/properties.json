@@ -1,10 +1,4 @@
 {
-    "93974": {
-        "property_name": "8975-Beautiful Place West Lucaya /15 Min From Disney",
-        "property_number": "8975",
-        "country": "US",
-        "state": "fl"
-    },
     "107102": {
         "property_name": "8984 - TOY STORY & Sheriff Woody in West Lucaya!!",
         "property_number": "8984",
@@ -29,12 +23,6 @@
         "country": "US",
         "state": "FL"
     },
-    "135926": {
-        "property_name": "8919/New - West Lucaya /15 Munutes From Disney",
-        "property_number": "8919",
-        "country": "US",
-        "state": "FL"
-    },
     "143528": {
         "property_name": "RB 10 \u00b7 Divine And Unique Apartment in Tulum / WiFI 150 MB",
         "property_number": "10",
@@ -53,21 +41,9 @@
         "country": "MX",
         "state": "Quintana Roo"
     },
-    "185440": {
-        "property_name": "8919 - CharmingTownhouse In Lucaya/15 Min From Disney",
-        "property_number": "8919",
-        "country": "US",
-        "state": "FL"
-    },
     "187346": {
         "property_name": "2736 \u00b7 Cozy Townhouse in Oakwater / Two Miles From Disney",
         "property_number": "2736",
-        "country": "US",
-        "state": "FL"
-    },
-    "193111": {
-        "property_name": "8805/2 - Exclusive Place 15 Min Disney & Rent a Car",
-        "property_number": "8805",
         "country": "US",
         "state": "FL"
     },
@@ -84,14 +60,44 @@
         "state": "Quintana Roo"
     },
     "208492": {
-        "property_name": "Amaru - Exclusive Studio in Aldea Zama",
-        "property_number": null,
+        "property_name": "Amaru 1 - Exclusive Studio in Aldea Zama",
+        "property_number": "1",
         "country": "MX",
         "state": "Quintana Roo"
     },
     "210004": {
         "property_name": "RB 4 - Enchanting Place/ Unheated Water Jacuzzi/FastWI-FI",
         "property_number": "4",
+        "country": "MX",
+        "state": "Quintana Roo"
+    },
+    "223014": {
+        "property_name": "Unique and Quiet gataway on Telchac beach",
+        "property_number": null,
+        "country": "MX",
+        "state": "Yucatan"
+    },
+    "229544": {
+        "property_name": "Sirenis - Beautiful cozy place steps from the beach",
+        "property_number": null,
+        "country": "MX",
+        "state": "Quintana Roo"
+    },
+    "229545": {
+        "property_name": "Chicxulub - Beautiful and Cozy Place five steps from the beach",
+        "property_number": null,
+        "country": "MX",
+        "state": "Yucat\u00e1n"
+    },
+    "229975": {
+        "property_name": "Amaru 20/ Modern & Relaxing Place in Aldea Zama",
+        "property_number": "20",
+        "country": "MX",
+        "state": "Quintana Roo"
+    },
+    "230966": {
+        "property_name": "PH 26/ Penthouse with Rooftop in the heart of Tulum",
+        "property_number": "26",
         "country": "MX",
         "state": "Quintana Roo"
     }

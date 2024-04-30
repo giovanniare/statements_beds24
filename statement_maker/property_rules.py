@@ -52,7 +52,7 @@ class PropertyRules(object):
             name = data[CS.PROPERTY_NAME]
 
             # 25% de comision
-            if p_num in ["9", "4", "10"]:
+            if p_num in ["9", "4", "10", "20"]:
                 comsion = 0.25
 
             # 22% de comision

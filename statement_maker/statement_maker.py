@@ -9,7 +9,7 @@ from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 from statement_maker.property_rules import PropertyRules
 from utils import consts as CS
-from utils.exceptions import NoBookings, NoProperyData
+from utils.exceptions import NoBookings, NoProperyData, UnexpectedError
 from utils.tools import Tools
 from utils.logger import Logger
 
@@ -22,6 +22,7 @@ class StatementMaker(object):
         self.rules = PropertyRules()
         self.report_from = None
         self.report_to = None
+        self.resume = []
 
     def set_report_dates(self, report_dates):
         self.report_from = report_dates.From
@@ -37,9 +38,14 @@ class StatementMaker(object):
         return valid_name.strip()
 
     def build_file(self, info, statement):
+        if isinstance(info, dict):
+            property_name = info[CS.PROPERTY_NAME]
+        else:
+            property_name = info
+
         # Franja azul
         franja_azul = Table(
-            [[info["property_name"]]],
+            [[property_name]],
             colWidths=[500],
             rowHeights=[40],
             style=[
@@ -269,7 +275,10 @@ class StatementMaker(object):
 
         if not temporary_booking_table:
             return False
-            
+
+        property_sumary = (property_info[CS.PROPERTY_NAME], round(total_bookings, 2))
+        self.resume.append(property_sumary)
+    
         self.sort_booking_table(booking_table_data, temporary_booking_table, total_bookings)
         self.booking_table(contenido, booking_table_data)
         return True
@@ -296,13 +305,48 @@ class StatementMaker(object):
         if listing_duplicated:
             return
 
-        property_name = self.validate_property_name(info['property_name'])
+        property_name = self.validate_property_name(info[CS.PROPERTY_NAME])
         file_name = date_folder_dir.join(["", f"\\{property_name}.pdf"])
         statement = canvas.Canvas(file_name, pagesize=letter)
         self.build_file(info, statement)
 
         if not self.build_booking_table(statement, info, prop_id):
             raise NoBookings
+
+        statement.save()
+
+    def summary_table(self, statement) -> None:
+        row_heights = [20 for _ in self.resume]
+        booking_table = Table(
+            self.resume,
+            colWidths=[350, 100],
+            rowHeights=row_heights,
+            style=[
+                ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),  # Color de fondo para el encabezado
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Color de texto para el encabezado
+                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Alineación al centro
+                ("VALIGN", (0, 0), (-1, 0), "MIDDLE"),
+                ("FONTSIZE", (0, 0), (-1, 0), 8),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Fuente en negrita para el encabezado
+                ('GRID', (0, 0), (-1, -1), 1, colors.gray),  # Agregar bordes a la tabla
+                ('GRID', (0, 0), (-1, 0), 1, colors.gray),  # Agregar bordes al encabezado
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Alineación a la izquierda
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),  # Fuente para el texto en las celdas
+                ('LEADING', (0, 0), (-1, -1), 14),  # Espaciado entre líneas (interlineado)
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ],
+        )
+
+        logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
+        table_y = (logo_y - sum(booking_table._rowHeights)) - 10
+        self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
+
+    def build_summary_file(self, date_folder_dir):
+        file_name = date_folder_dir.join(["", "\\Summary.pdf"])
+        statement = canvas.Canvas(file_name, pagesize=letter)
+
+        self.build_file("Property Income Summary", statement)
+        self.summary_table(statement)
 
         statement.save()
 
@@ -316,12 +360,22 @@ class StatementMaker(object):
             self.logger.printer("Statement_maker.make_single_statement()", msg)
             raise NoProperyData
 
-        self.create_property_statement(propery_id, property_info, date_folder_dir)
+        try:
+            self.create_property_statement(propery_id, property_info, date_folder_dir)
+        except Exception as e:
+            name = property_info['property_name']
+            msg = f"An Error Occours over {propery_id} - {name}: \n{e}"
+            self.logger.printer("Statement_maker.make_all_statements()", msg)
+            error_data = (propery_id, name)
+            raise UnexpectedError(error_data)
 
         msg = f"{propery_id} - {property_info['property_name']} was made successfuly"
         self.logger.printer("Statement_maker.make_single_statement()", msg)
 
     def make_all_statements(self) -> None:
+        error_list = []
+        self.resume = [CS.SUMMARY_TABLE_HEADER]
+
         self.create_statements_folder()
         date_folder_dir = self.get_date_folder_dir()
         properties = self.tools.get_full_properties_data()
@@ -330,9 +384,19 @@ class StatementMaker(object):
             try:
                 self.create_property_statement(prop_id, info, date_folder_dir)  
             except NoBookings:
-                continue          
+                continue
+            except Exception as e:
+                name = info[CS.PROPERTY_NAME]
+                msg = f"An Error Occours over {prop_id} - {name}: \n{e}"
+                self.logger.printer("Statement_maker.make_all_statements()", msg)
+                error_data = (prop_id, name)
+                error_list.append(error_data)
 
-        # self.tools.finish_progress(loop, progress_bar, int_bar)
+        self.build_summary_file(date_folder_dir)
+
+        if error_list:
+            raise UnexpectedError(error_list)
+
         msg = "All reports were made successfully"
         self.logger.printer("Statement_maker.make_all_statements()", msg)
 

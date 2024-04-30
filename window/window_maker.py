@@ -8,7 +8,7 @@ from xero.xero_api import XeroApi
 from statement_maker.statement_maker import StatementMaker
 from statement_maker.property_rules import PropertyRules
 from utils import consts as CS
-from utils.exceptions import NoBookings, NoProperyData, NoRequestResponse, NonSuccessfulRequest
+from utils.exceptions import NoBookings, NoProperyData, NoRequestResponse, NonSuccessfulRequest, UnexpectedError
 from utils.logger import Logger
 from utils.tools import Tools, StringVar
 
@@ -189,8 +189,13 @@ class Window(object):
         try:
             self.statement_maker.make_all_statements()
             label.config(text="All statements were created!!", fg="#27A243")
-        except:
-            label.config(text="Something is wrong, cannot build all staments. An error occurs.", fg="red")        
+        except UnexpectedError as e:
+            msg = "Something is wrong. \n"
+            for info in e.errors:
+                msg += f"Unable to build {info[0]} - {info[1]}. \n"
+
+            msg += "The rest of reports were made successfuly."
+            label.config(text=msg, fg="red")        
 
     def build_all_statements(self) -> None:
         self.view.pack_forget()
@@ -223,8 +228,9 @@ class Window(object):
             label.config(text=f"{data.name} was not created: {e.message}", fg="red")
         except IndexError:
             label.config(text="Please select one property before hit the button.", fg="red")
-        except:
-            label.config(text="Something went wrong.. An error occurs", fg="red")
+        except UnexpectedError as e:
+            msg = f"Something is wrong. \n Unable to build {e.errors[0]} - {e.errors[1]}"
+            label.config(text=msg, fg="red")
 
     def build_single_statement(self) -> None:
         self.view.pack_forget()
