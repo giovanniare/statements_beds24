@@ -127,7 +127,8 @@ class BedsHandler(GenericHandler):
 
         params = {
             "includeLanguages": "all",
-            "includeTexts": "all"
+            "includeTexts": "all",
+            "includeAllRooms": "true"
         }
 
         url = f"{CS.BEDS_BASE_URL}properties"
@@ -139,7 +140,7 @@ class BedsHandler(GenericHandler):
 
         return self.tools.parse_properties_from_beds(api_response)
 
-    def get_property_bookings(self, property_id, arrival_from=None, arrival_to=None) -> dict:
+    def get_property_bookings(self, property_id, arrival_from=None, arrival_to=None, room=None) -> dict:
         """
         *****************************************************************************
         GET /authentication/bookings
@@ -182,6 +183,9 @@ class BedsHandler(GenericHandler):
                 "includeGuests": "true",
                 "includeInvoiceItems": "true",
             }
+
+        if room is not None:
+            params["roomId"] = room[CS.ROOM_ID]
 
         url = f"{CS.BEDS_BASE_URL}bookings"
         api_response = self.api.get_request(url=url, headers=header, params=params)

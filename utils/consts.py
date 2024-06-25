@@ -17,6 +17,9 @@ PROPERTY_NAME = "property_name"
 PROPERTY_NUMBER = "property_number"
 STATE = "state"
 COUNTRY = "country"
+ROOMS = "rooms"
+ROOM_ID = "room_id"
+ROOM_NAME = "room_name"
 FL = "FL"
 FL_L = "fl"
 FLORIDA = "FLORIDA"
@@ -34,6 +37,7 @@ RESORT_FEE_KEY_2 = "resort fee"
 PET_FEE_KEY = "Pet fee"
 ROOM_RATE_DESCRIPTION = "[ROOMNAME1] [FIRSTNIGHT] - [LEAVINGDAY]"
 VAT_MEX = "VAT on Accommodation (Mexico)"
+EXTRA_GUEST_1 = "Extra guest fee"
 
 XERO_BASE_URL = "https://api.xero.com/"
 XERO_CONNECT_URL = "https://api.xero.com/connections"
@@ -51,6 +55,8 @@ XERO_TOKEN_FILE = {
 }
 
 PASS_COLOR = "#27A243"
+
+SIRENIS_ID = "229544"
 
 ##########################################################################################
 # Numeric consts
@@ -74,10 +80,12 @@ GENERIC_SPACE_Y = 40
 ##########################################################################################
 
 BOOKING_TABLE_HEADER = ["Description", "From", "To", "Total", "Line Total"]
+BOOKING_TABLE_HEADER_SIRENIS = ["Description", "From", "To", "Gross", "Cleaning fee", "Total"]
 SUMMARY_TABLE_HEADER = ["Property Name", "Total"]
 IGNORE_CONCEPT_LIST = [
     ROOM_RATE_DESCRIPTION,
-    VAT_MEX
+    VAT_MEX,
+    EXTRA_GUEST_1
 ]
 
 FLORIDA_IDS = [

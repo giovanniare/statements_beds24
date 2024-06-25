@@ -164,11 +164,21 @@ class Tools(object):
             else:
                 property_num = numbers[0]
 
+            room_list = []
+            property_rooms = prop["roomTypes"]
+            for room in property_rooms:
+                room_info = {
+                    CS.ROOM_ID: room["id"],
+                    CS.ROOM_NAME: room["name"]
+                }
+                room_list.append(room_info)
+
             property_info = {
                 CS.PROPERTY_NAME: property_name.strip(),
                 CS.PROPERTY_NUMBER: property_num,
                 CS.COUNTRY: property_country,
-                CS.STATE: property_state
+                CS.STATE: property_state,
+                CS.ROOMS: room_list
             }
 
             data[property_id] = property_info
@@ -217,6 +227,8 @@ class Tools(object):
         for id_, data in properties.items():
 
             property_number = data[CS.PROPERTY_NUMBER]
+            if property_number is None:
+                property_number = id_
 
             if property_number not in duplicated_dict:
                 duplicated_dict[property_number] = [id_]

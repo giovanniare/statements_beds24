@@ -38,7 +38,7 @@ class PropertyRules(object):
             p_num = data[CS.PROPERTY_NUMBER]
             name = data[CS.PROPERTY_NAME]
 
-            if p_num in ["19"] or "Temozon" in name:
+            if p_num in ["19"] or any(nstr in name for nstr in ["Temozon", "Sirenis"]):
                 final_commission_exempt.append(id_)
 
         return final_commission_exempt
@@ -66,6 +66,10 @@ class PropertyRules(object):
             # 18% de comision
             elif p_num in ["14"]:
                 comsion = 0.18
+
+            # 10% de comision
+            elif p_num in ["2831"]:
+                comsion = 0.1
 
             else:
                 continue
@@ -111,14 +115,17 @@ class PropertyRules(object):
             
 
     def booking_from_beds(self, charges, income) -> int:
-        commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_1, None)
-        if not commission_per_card:
-            commission_per_card = charges.get(CS.CART_TRANSACTION_KEY_2, None)
+        commission_per_card_1 = charges.get(CS.CART_TRANSACTION_KEY_1, None)
+        commission_per_card_2 = charges.get(CS.CART_TRANSACTION_KEY_2, None)
+
+        commission_per_card = commission_per_card_2 or commission_per_card_1
+
+        if commission_per_card_2:
             charges.pop(CS.CART_TRANSACTION_KEY_2)
-        else:
+        elif commission_per_card_1:
             charges.pop(CS.CART_TRANSACTION_KEY_1)
 
-        sub_income = income - commission_per_card
+        sub_income = income - commission_per_card if commission_per_card is not None else income
         three_porcent_less = sub_income - (sub_income * CS.AIRBNB_COMMISSION)
 
         total_charges_amount = 0
