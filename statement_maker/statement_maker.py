@@ -105,6 +105,9 @@ class StatementMaker(object):
         logo_x = ((612 - CS.ITEM_X) - CS.IMAGE_WIDTH) - 20
         self.add_item_to_document(logo, statement, logo_x, logo_y)
 
+    def add_new_page(self):
+        pass
+
     def calculate_sirenis_totals(self, invoice_items, price, property_id, property_info) -> tuple:
         booking_from_beds = True
         income = None
@@ -384,7 +387,24 @@ class StatementMaker(object):
 
             self.resume.append(property_sumary)
     
-            self.sirenis_booking_table(contenido, booking_table_data)
+            booking_table_data_len = len(booking_table_data)
+            if booking_table_data_len <= 24:
+                self.sirenis_booking_table(contenido, booking_table_data)
+                return True
+
+            table_block = 23
+            for i in range(0, booking_table_data_len, table_block):
+                block = booking_table_data[i:i + table_block]
+
+                if i > 0:
+                    block.insert(0, CS.BOOKING_TABLE_HEADER_SIRENIS)
+
+                self.sirenis_booking_table(contenido, block)
+
+                if block[-1] == booking_table_data_len:
+                    continue
+
+                contenido.showPage()
             return True
 
         self.resume.append(property_sumary)
@@ -504,7 +524,7 @@ class StatementMaker(object):
         except Exception as e:
             name = property_info['property_name']
             msg = f"An Error Occours over {propery_id} - {name}: \n{e}"
-            self.logger.printer("Statement_maker.make_all_statements()", msg)
+            self.logger.printer("Statement_maker.make_single_statement()", msg)
             error_data = (propery_id, name)
             raise UnexpectedError(error_data)
 
