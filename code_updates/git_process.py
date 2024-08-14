@@ -8,6 +8,7 @@ class GitHandler:
 
     def checkout_all(self):
         try:
+            print("Deleting local changes: \n===========> git checkout .")
             result = subprocess.run(["git", "checkout", "."], check=True, capture_output=True, text=True)
             print(result.stdout)
         except subprocess.CalledProcessError as e:
@@ -15,6 +16,7 @@ class GitHandler:
 
     def pull(self):
         try:
+            print("Pulling updates: \n===========> git pull")
             result = subprocess.run(["git", "pull"], check=True, capture_output=True, text=True)
             print(result.stdout)
         except subprocess.CalledProcessError as e:
