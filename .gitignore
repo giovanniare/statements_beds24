@@ -8,3 +8,4 @@ app_api_handlers/properties.json
 
 # Ignorar todas las carpetas __pycache__
 __pycache__/
+**/__pycache__/
