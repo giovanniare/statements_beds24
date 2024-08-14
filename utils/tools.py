@@ -47,6 +47,23 @@ class Tools(object):
         self.token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'token.json')
         self.xero_token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'xero_token.json')
         self.properties_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'properties.json')
+        self.verify_json_files()
+
+    def verify_json_files(self):
+        token_data = {
+            "token": None,
+            "valid_token": False,
+            "refresh_token": None
+        }
+        properties = {}
+
+        if not os.path.exists(self.token_file_path):
+            with open(self.token_file_path, "w") as json_file:
+                json.dump(token_data, json_file, indent=4)
+
+        if not os.path.exists(self.properties_file_path):
+            with open(self.properties_file_path, "w") as json_file:
+                json.dump(properties, json_file, indent=4)
 
     def get_device_name(self) -> str:
         try:
