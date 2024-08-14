@@ -287,7 +287,10 @@ class Tools(object):
 
     def get_logo_path(self):
         project_path = self.get_project_path()
-        logo_path = project_path.join(["", "\\utils\\images\\logo.png"])
+        if CS.IS_WINDOWS:
+            logo_path = project_path.join(["", "\\utils\\images\\logo.png"])
+        elif CS.IS_MACOS:
+            logo_path = project_path.join(["", "/utils/images/logo.png"])
         return logo_path
 
     def build_progress_bar(self, root):

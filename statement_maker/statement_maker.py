@@ -560,8 +560,9 @@ class StatementMaker(object):
         self.logger.printer("Statement_maker.make_all_statements()", msg)
 
     def create_statements_folder(self) -> None:
+        dash_type = "/" if CS.IS_MACOS else "\\"
         current_dir = self.tools.get_project_path()
-        statements_dir = current_dir.join(["", "\\statements"])
+        statements_dir = current_dir.join(["", f"{dash_type}statements"])
         
         try:
             os.mkdir(statements_dir)
@@ -572,9 +573,9 @@ class StatementMaker(object):
         if self.report_from is None or self.report_to is None:
             month = self.tools.get_current_month()
             year = self.tools.get_current_year()
-            date_path = f"\\{month}-{year}"
+            date_path = f"{dash_type}{month}-{year}"
         else:
-            date_path = f"\\{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
+            date_path = f"{dash_type}{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
 
         date_folder_dir = statements_dir.join(["", date_path])
 
@@ -584,7 +585,7 @@ class StatementMaker(object):
         except FileExistsError:
             self.logger.printer("statement_maker/create_statements_folder", f"Reports dir: '{date_folder_dir}' found.")
 
-        sirenis_folder = date_folder_dir.join(["", "\\sirenis"])
+        sirenis_folder = date_folder_dir.join(["", f"{dash_type}sirenis"])
         try:
             os.mkdir(sirenis_folder)
             self.logger.printer("statement_maker/create_statements_folder", f"Reports dir: '{sirenis_folder}' successfully created.")
