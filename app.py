@@ -1,17 +1,26 @@
 import tkinter as tk
 from handler.app_handler import AppHandler
 
-# Build tkinter
-root = tk.Tk()
 
-# Call main handler
-app = AppHandler(root)
+class App:
+    def __init__(self) -> None:
+        self.root = None
+        self.app = None
 
-# Authentication and data base creation
-app.initialize()
+    def build(self):
+        # Build tkinter
+        self.root = tk.Tk()
+        # Call main handler
+        self.app = AppHandler(self.root)
+        # Authentication and data base creation
+        self.app.initialize()
 
-# Build tkinter main window
-app.lauch()
+    def run(self):
+        # Build project
+        self.build()
 
-# Tkinter loop
-root.mainloop()
+        # Build tkinter main window
+        self.app.lauch()
+
+        # Tkinter loop
+        self.root.mainloop()

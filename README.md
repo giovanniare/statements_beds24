@@ -1,5 +1,15 @@
 ## BEDS 24 - Statements Maker ##
 
+#### Installation
+```
+pip install -r requirements.txt
+```
+
+#### Run app
+```
+py run.py
+```
+
 This is the project structure
 
 ```
@@ -12,12 +22,30 @@ utils/
     ├── consts
     ├── logger
     ├── tools
-    └── window_maker
-beds24/
+    └── exceptions
+app_api_handlers/
     ├── init
-    └── beds_api_handler
+    ├── beds_api_handler
+    ├── generic_handler
+    ├── properties
+    ├── token
+    └── xero_api_handler
+code_updates/
+    ├── init
+    └── git_process
+handler/
+    ├── init
+    └── app_handler
+statement_maker/
+    ├── init
+    ├── property_rules
+    └── statement_maker
+xero/
+    └── TBD
 app.py
+run.py
 README.md
+requirements.txt
 ```
 
 #### Python proyect
