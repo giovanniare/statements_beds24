@@ -228,7 +228,9 @@ class StatementMaker(object):
                 continue
 
             gross, cleaning, total = self.calculate_sirenis_totals(booking["invoiceItems"], booking["price"], prop_id, property_info)
-
+            if booking["channel"] == "expedia":
+                total = booking["price"]
+ 
             booking_data = [
                 f"{booking['firstName']} {booking['lastName']}",
                 booking["arrival"],
