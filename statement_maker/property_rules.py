@@ -125,7 +125,7 @@ class PropertyRules(object):
         elif commission_per_card_1:
             charges.pop(CS.CART_TRANSACTION_KEY_1)
 
-        sub_income = income - commission_per_card if commission_per_card is not None else income
+        # sub_income = income - commission_per_card if commission_per_card is not None else income
         # three_porcent_less = sub_income - (sub_income * CS.AIRBNB_COMMISSION)
 
         total_charges_amount = 0

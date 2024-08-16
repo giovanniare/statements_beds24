@@ -124,7 +124,7 @@ class StatementMaker(object):
             if concept in CS.IGNORE_CONCEPT_LIST:
                 continue
 
-            if concept in [CS.CLEANING_KEY_1, CS.CLEANING_KEY_2]:
+            if concept in [CS.CLEANING_KEY_1, CS.CLEANING_KEY_2] or "Cleaning fee" in concept:
                 cleaning += item["amount"]
 
             charges[concept] = item["amount"]
