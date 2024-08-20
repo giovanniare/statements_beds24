@@ -24,6 +24,7 @@ class StatementMaker(object):
         self.report_from = None
         self.report_to = None
         self.resume = []
+        self.dash_type = "/" if CS.IS_MACOS else "\\"
 
     def set_report_dates(self, report_dates):
         self.report_from = report_dates.From
@@ -406,11 +407,11 @@ class StatementMaker(object):
         if self.report_from is None or self.report_to is None:
             month = self.tools.get_current_month()
             year = self.tools.get_current_year()
-            date_path = f"\\statements\\{month}-{year}"
+            date_path = f"{self.dash_type}statements{self.dash_type}{month}-{year}"
         else:
             month = self.report_from.month
             year = self.report_from.year
-            date_path = f"\\statements\\{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
+            date_path = f"{self.dash_type}statements{self.dash_type}{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
 
         project_dir = self.tools.get_project_path()
         date_folder_dir = project_dir.join(["", date_path])
@@ -426,7 +427,7 @@ class StatementMaker(object):
 
         title = info[CS.PROPERTY_NAME] if room is None else room[CS.ROOM_NAME]
         property_name = self.validate_property_name(title)
-        file_name = date_folder_dir.join(["", f"\\{property_name}.pdf"])
+        file_name = date_folder_dir.join(["", f"{self.dash_type}{property_name}.pdf"])
         statement = canvas.Canvas(file_name, pagesize=letter)
         self.build_file(info, statement, room=room)
 
@@ -462,7 +463,7 @@ class StatementMaker(object):
         self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
 
     def build_summary_file(self, date_folder_dir):
-        file_name = date_folder_dir.join(["", "\\Summary.pdf"])
+        file_name = date_folder_dir.join(["", f"{self.dash_type}Summary.pdf"])
         statement = canvas.Canvas(file_name, pagesize=letter)
 
         self.build_file("Property Income Summary", statement)
@@ -475,7 +476,7 @@ class StatementMaker(object):
         no_booking_on_room_list = []
         error_list = []
 
-        sirenis_folder = date_folder_dir.join(["", "\\sirenis"])
+        sirenis_folder = date_folder_dir.join(["", f"{self.dash_type}sirenis"])
 
         for room in property_rooms:
             try:
@@ -550,9 +551,8 @@ class StatementMaker(object):
         self.logger.printer("Statement_maker.make_all_statements()", msg)
 
     def create_statements_folder(self) -> None:
-        dash_type = "/" if CS.IS_MACOS else "\\"
         current_dir = self.tools.get_project_path()
-        statements_dir = current_dir.join(["", f"{dash_type}statements"])
+        statements_dir = current_dir.join(["", f"{self.dash_type}statements"])
         
         try:
             os.mkdir(statements_dir)
@@ -563,9 +563,9 @@ class StatementMaker(object):
         if self.report_from is None or self.report_to is None:
             month = self.tools.get_current_month()
             year = self.tools.get_current_year()
-            date_path = f"{dash_type}{month}-{year}"
+            date_path = f"{self.dash_type}{month}-{year}"
         else:
-            date_path = f"{dash_type}{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
+            date_path = f"{self.dash_type}{self.report_from.month}-{self.report_from.year}_to_{self.report_to.month}-{self.report_to.year}"
 
         date_folder_dir = statements_dir.join(["", date_path])
 
@@ -575,7 +575,7 @@ class StatementMaker(object):
         except FileExistsError:
             self.logger.printer("statement_maker/create_statements_folder", f"Reports dir: '{date_folder_dir}' found.")
 
-        sirenis_folder = date_folder_dir.join(["", f"{dash_type}sirenis"])
+        sirenis_folder = date_folder_dir.join(["", f"{self.dash_type}sirenis"])
         try:
             os.mkdir(sirenis_folder)
             self.logger.printer("statement_maker/create_statements_folder", f"Reports dir: '{sirenis_folder}' successfully created.")
