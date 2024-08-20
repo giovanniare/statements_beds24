@@ -103,6 +103,7 @@ class Window(object):
         build_statement_btn = tk.Button(options_frame, text="Make Statement", command=self.build_single_statement)
         build_statement_btn.pack(padx=25, pady=20, side="left")
 
+        # This could be added later or could be deprecated.
         xero_btn = tk.Button(options_frame, text="Xero")
         xero_btn.pack(padx=25, pady=20, side="left")
 
