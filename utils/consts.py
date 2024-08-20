@@ -93,7 +93,7 @@ GENERIC_SPACE_Y = 40
 ##########################################################################################
 
 BOOKING_TABLE_HEADER = ["Description", "From", "To", "Total", "Line Total"]
-BOOKING_TABLE_HEADER_SIRENIS = ["Description", "From", "To", "Gross", "Cleaning fee", "Total"]
+BOOKING_TABLE_HEADER_SIRENIS = ["Description", "From", "To", "Total"]
 SUMMARY_TABLE_HEADER = ["Property Name", "Total"]
 IGNORE_CONCEPT_LIST = [
     ROOM_RATE_DESCRIPTION,

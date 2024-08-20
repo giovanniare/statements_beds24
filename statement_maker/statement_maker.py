@@ -111,7 +111,7 @@ class StatementMaker(object):
     def calculate_sirenis_totals(self, invoice_items, price, property_id, property_info) -> tuple:
         booking_from_beds = True
         income = None
-        cleaning = 0
+        # cleaning = 0
         charges = {}
 
         for item in invoice_items:
@@ -124,15 +124,15 @@ class StatementMaker(object):
             if concept in CS.IGNORE_CONCEPT_LIST:
                 continue
 
-            if concept in [CS.CLEANING_KEY_1, CS.CLEANING_KEY_2] or "Cleaning fee" in concept:
-                cleaning += item["amount"]
+            # if concept in [CS.CLEANING_KEY_1, CS.CLEANING_KEY_2] or "Cleaning fee" in concept:
+            #    cleaning += item["amount"]
 
             charges[concept] = item["amount"]
 
         income_choice = price if booking_from_beds else income
         total = self.rules.get_total(charges, income_choice, property_id, booking_from_beds)
 
-        return income_choice, cleaning, total
+        return income_choice, total
 
     def calculate_total_and_line_total(self, invoice_items, price, property_id, property_info) -> tuple:
         booking_from_beds = True
@@ -220,32 +220,26 @@ class StatementMaker(object):
     def get_filled_sirenis_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
         temporary_booking_table = []
         total_bookings = 0
-        gross_bookings = 0
-        cleaning_bookings = 0
 
         for booking in bookings:
             if booking["status"] == "cancelled":
                 continue
 
-            gross, cleaning, total = self.calculate_sirenis_totals(booking["invoiceItems"], booking["price"], prop_id, property_info)
+            _, total = self.calculate_sirenis_totals(booking["invoiceItems"], booking["price"], prop_id, property_info)
             if booking["channel"] == "expedia":
-                total = booking["price"]
+                total = booking["price"] - (booking["price"] * 0.05)
  
             booking_data = [
                 f"{booking['firstName']} {booking['lastName']}",
                 booking["arrival"],
                 booking["departure"],
-                f"$ {round(gross, 2)}",
-                f"$ {round(cleaning, 2)}",
                 f"$ {round(total, 2)}",
             ]
 
             temporary_booking_table.append(booking_data)
             total_bookings += total
-            gross_bookings += gross
-            cleaning_bookings += cleaning
 
-        return temporary_booking_table, total_bookings, gross_bookings, cleaning_bookings
+        return temporary_booking_table, total_bookings
 
     def get_filled_booking_data(self, bookings, prop_id, property_info, booking_table_data) -> None:
         temporary_booking_table = []
@@ -273,7 +267,7 @@ class StatementMaker(object):
         row_heights = [20 for _ in booking_table_data]
         booking_table = Table(
             booking_table_data,
-            colWidths=[120, 60, 60, 75, 75, 75],
+            colWidths=[200, 82.5, 82.5, 100],
             rowHeights=row_heights,
             style=[
                 ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),  # Color de fondo para el encabezado
@@ -330,8 +324,6 @@ class StatementMaker(object):
             bookings = self.beds_handler.get_property_bookings(prop_id, arrival_from=self.report_from, arrival_to=self.report_to, room=room)
 
         if not bookings:
-            if prop_id == CS.SIRENIS_ID:
-                return None, None, None
             return None, None
 
         if prop_id == CS.SIRENIS_ID:
@@ -356,8 +348,6 @@ class StatementMaker(object):
 
         temporary_booking_table = []
         total_bookings = 0
-        gross = 0
-        cleaning = 0
 
         for p_id in listings:
             result = self.booking_data(property_info, p_id, booking_table_data, room)
@@ -369,10 +359,6 @@ class StatementMaker(object):
             temporary_booking_table.extend(temporary_bookings)
             total_bookings += total
 
-            if prop_id == CS.SIRENIS_ID:
-                gross += result[2]
-                cleaning += result[3]
-
         if not temporary_booking_table:
             return False
 
@@ -380,38 +366,38 @@ class StatementMaker(object):
 
         property_sumary = (property_info[CS.PROPERTY_NAME], round(total_bookings, 2))
         if prop_id == CS.SIRENIS_ID:
-            property_sumary = (property_info[CS.PROPERTY_NAME], round(total_bookings, 2), round(gross, 2), round(cleaning, 2))
+            property_sumary = (property_info[CS.PROPERTY_NAME], round(total_bookings, 2))
             booking_table_data.pop(-1)
-            booking_table_data.append(["", "", "", "", "", ""])
-            booking_table_data.append(["", "", "", "", "GROSS TOTAL", f"$ {round(gross, 2)}"])
-            booking_table_data.append(["", "", "", "", "CLEANING TOTAL", f"$ {round(cleaning, 2)}"])
-            booking_table_data.append(["", "", "", "", "NET TOTAL", f"$ {round(total_bookings, 2)}"])
-
-            self.resume.append(property_sumary)
-    
-            booking_table_data_len = len(booking_table_data)
-            if booking_table_data_len <= 24:
-                self.sirenis_booking_table(contenido, booking_table_data)
-                return True
-
-            table_block = 23
-            for i in range(0, booking_table_data_len, table_block):
-                block = booking_table_data[i:i + table_block]
-
-                if i > 0:
-                    block.insert(0, CS.BOOKING_TABLE_HEADER_SIRENIS)
-
-                self.sirenis_booking_table(contenido, block)
-
-                if block[-1] == booking_table_data_len:
-                    continue
-
-                contenido.showPage()
-            return True
+            booking_table_data.append(["", "", "", ""])
+            booking_table_data.append(["", "", "TOTAL", f"$ {round(total_bookings, 2)}"])
 
         self.resume.append(property_sumary)
-    
-        self.booking_table(contenido, booking_table_data)
+
+        booking_table_data_len = len(booking_table_data)
+        if booking_table_data_len <= 24:
+            if prop_id == CS.SIRENIS_ID:
+                self.sirenis_booking_table(contenido, booking_table_data)
+            else:
+                self.booking_table(contenido, booking_table_data)
+            return True
+
+        table_block = 23
+        for i in range(0, booking_table_data_len, table_block):
+            block = booking_table_data[i:i + table_block]
+
+            if i > 0:
+                block.insert(0, CS.BOOKING_TABLE_HEADER_SIRENIS)
+
+            if prop_id == CS.SIRENIS_ID:
+                self.sirenis_booking_table(contenido, block)
+            else:
+                self.booking_table(contenido, block)
+
+            if block[-1] == booking_table_data_len:
+                continue
+
+            contenido.showPage()
+
         return True
 
     def get_date_folder_dir(self):

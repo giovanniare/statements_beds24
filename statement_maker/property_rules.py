@@ -23,6 +23,8 @@ class PropertyRules(object):
 
             elif p_num in ["3208"]:
                 rule = self.rule_3208
+            elif id_ == CS.SIRENIS_ID:
+                rule = self.rule_sirenis
             else:
                 continue
 
@@ -205,3 +207,17 @@ class PropertyRules(object):
             return self.booking_from_beds(charges, income)
 
         return self.booking_from_airbnb(charges, income)
+
+    def rule_sirenis(self, charges, income, booking_from_beds=False):
+        cleaning = None
+        for charge in charges.keys():
+            if charge in [CS.CLEANING_KEY_1, CS.CLEANING_KEY_2] or "Cleaning fee" in charge:
+                cleaning = charge
+
+        if cleaning:
+            charges.pop(cleaning)
+        
+        if booking_from_beds:
+            return self.booking_from_beds(charges, income)
+
+        return self.booking_from_airbnb({}, income)
