@@ -290,7 +290,7 @@ class StatementMaker(object):
         self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
         # self.build_bar_chart(statement, booking_table_data) SE REVISARA LUEGO
 
-    def booking_table(self, statement, booking_table_data) -> None:
+    def booking_table(self, statement, booking_table_data, build_barchar=False) -> None:
         row_heights = [20 for _ in booking_table_data]
         booking_table = Table(
             booking_table_data,
@@ -315,7 +315,8 @@ class StatementMaker(object):
         logo_y = (CS.BLUE_LABEL_Y - CS.IMAGE_HEIGHT) - 10
         table_y = (logo_y - sum(booking_table._rowHeights)) - 10
         self.add_item_to_document(booking_table, statement, CS.ITEM_X, table_y)
-        self.build_bar_chart(statement, booking_table_data)
+        if build_barchar:
+            self.build_bar_chart(statement, booking_table_data)
 
     def booking_data(self, property_info, prop_id, booking_table_data, room=None):
         if self.report_from is None or self.report_to is None:
@@ -378,7 +379,7 @@ class StatementMaker(object):
             if prop_id == CS.SIRENIS_ID:
                 self.sirenis_booking_table(contenido, booking_table_data)
             else:
-                self.booking_table(contenido, booking_table_data)
+                self.booking_table(contenido, booking_table_data, build_barchar=True)
             return True
 
         table_block = 23
@@ -386,7 +387,8 @@ class StatementMaker(object):
             block = booking_table_data[i:i + table_block]
 
             if i > 0:
-                block.insert(0, CS.BOOKING_TABLE_HEADER_SIRENIS)
+                header = CS.BOOKING_TABLE_HEADER_SIRENIS if prop_id == CS.SIRENIS_ID else CS.BOOKING_TABLE_HEADER
+                block.insert(0, header)
 
             if prop_id == CS.SIRENIS_ID:
                 self.sirenis_booking_table(contenido, block)
