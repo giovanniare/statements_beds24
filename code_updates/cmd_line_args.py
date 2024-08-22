@@ -10,12 +10,12 @@ class CmdLineArgs:
         self.parser = argparse.ArgumentParser(description="Execution mode")
 
     def build(self):
-        self.parser.add_argument("branch", type=str, help="Repo branch")
-        self.parser.add_argument("-d", "--dev", action="store_true", help="Specify branch to run the application")
+        self.parser.add_argument("-b", "--branch", type=str, help="Repo branch", required=False)
+        self.parser.add_argument("-d", "--dev", action="store_true", help="Specify branch to run the application", required=False)
 
         self.args = self.parser.parse_args()
 
-    
+
 
 
     

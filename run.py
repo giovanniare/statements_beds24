@@ -4,10 +4,12 @@ from code_updates.cmd_line_args import CmdLineArgs
 
 if __name__ == "__main__":
     cmd_line = CmdLineArgs()
-    git = GitHandler()
+    cmd_line.initialize()
+    cmd_line.build()
 
     args = cmd_line.args
     if not args.dev:
+        git = GitHandler()
         git.checkout_all()
         branch = args.branch
         if branch:
