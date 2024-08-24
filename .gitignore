@@ -1,5 +1,6 @@
 .vscode/
 .idea/
+qr/
 statements/
 app_api_handlers/token.json
 app_api_handlers/xero_token.json
