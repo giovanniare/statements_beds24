@@ -9,9 +9,10 @@ from tkinter import ttk
 from datetime import datetime
 from collections import OrderedDict, namedtuple
 from utils import consts as CS
-
+from utils.logger import Logger
 
 reverse_property_tuple = namedtuple("menu_item", ["name", "id_"])
+room_tuple = namedtuple("room_item", ["name", "id_"])
 xero_client_tuple = namedtuple("xero_client", ["client_id", "client_secret"])
 
 
@@ -47,7 +48,9 @@ class Tools(object):
         self.token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'token.json')
         self.xero_token_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'xero_token.json')
         self.properties_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'properties.json')
+        self.sirenis_properties_file_path = os.path.join(os.path.dirname(__file__), '..', 'app_api_handlers', 'sirenis_properties.json')
         self.verify_json_files()
+        self.logger = Logger()
 
     def verify_json_files(self):
         token_data = {
@@ -237,6 +240,13 @@ class Tools(object):
 
         return data
 
+    def get_full_sirenis_properties_data(self):
+        with open(self.sirenis_properties_file_path, "r") as sirenis_properties_file:
+            data = json.load(sirenis_properties_file)
+
+        return data
+
+
     def get_duplicate_properties(self):
         properties = self.get_full_properties_data()
 
@@ -275,6 +285,21 @@ class Tools(object):
         sorted_dict = sorted(reverse_property_dict)
         for name in sorted_dict:
             menu_item = reverse_property_tuple(name, reverse_property_dict[name])
+            property_list.append(menu_item)
+
+        return property_list
+
+    def get_sorted_rooms(self):
+        properties = self.get_full_sirenis_properties_data()
+        reverse_property_dict = {}
+        property_list = []
+
+        for data in properties["229544"]["rooms"]:
+            reverse_property_dict[data["room_id"]] = data["room_name"]
+
+        sorted_dict = sorted(reverse_property_dict)
+        for name in sorted_dict:
+            menu_item = room_tuple(reverse_property_dict[name], name)
             property_list.append(menu_item)
 
         return property_list
