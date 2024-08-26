@@ -5,6 +5,7 @@ from collections import namedtuple
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
 from app_api_handlers.beds_api_handler import BedsHandler
 from xero.xero_api import XeroApi
+from qr_maker.qr_maker import QrMaker
 from statement_maker.statement_maker import StatementMaker
 from statement_maker.property_rules import PropertyRules
 from utils import consts as CS
@@ -20,6 +21,7 @@ class Window(object):
         self.logger = Logger()
         self.beds_api = BedsHandler()
         self.xero_api = XeroApi()
+        self.qr_maker = QrMaker()
         self.statement_maker = StatementMaker()
         self.invite_code = None
         self.setup_msg = None
@@ -104,8 +106,8 @@ class Window(object):
         build_statement_btn.pack(padx=25, pady=20, side="left")
 
         # This could be added later or could be deprecated.
-        xero_btn = tk.Button(options_frame, text="Xero")
-        xero_btn.pack(padx=25, pady=20, side="left")
+        qr_btn = tk.Button(options_frame, text="QR codes", command=self.build_qr_codes)
+        qr_btn.pack(padx=25, pady=20, side="left")
 
         self.basic_btn_frame(main_frame)
 
@@ -159,6 +161,7 @@ class Window(object):
 
         self.logger.printer("window_maker.get_dates_from_calendar()", f"From: {calendar_from.selection_get()} - To: {calendar_to.selection_get()}")
 
+        self.qr_maker.set_date_from_and_date_to(report_dates)
         self.statement_maker.set_report_dates(report_dates)
         window_pop.pack_forget()
         self.main_screen()
@@ -233,6 +236,21 @@ class Window(object):
             msg = f"Something is wrong. \n Unable to build {e.errors[0]} - {e.errors[1]}"
             label.config(text=msg, fg="red")
 
+    def create_qr(self, label, prop_data):
+        try:
+            data = prop_data.get()
+            self.qr_maker.generate_qrs(data.id_, data.name)
+            label.config(text=f"{data.name} was created", fg=CS.PASS_COLOR)
+        except NoBookings as e:
+            label.config(text=f"{data.name} was not created: {e.message}", fg="orange")
+        except NoProperyData as e:
+            label.config(text=f"{data.name} was not created: {e.message}", fg="red")
+        except IndexError:
+            label.config(text="Please select one property before hit the button.", fg="red")
+        except UnexpectedError as e:
+            msg = f"Something is wrong. \n Unable to build {e.errors[0]} - {e.errors[1]}"
+            label.config(text=msg, fg="red")
+
     def build_single_statement(self) -> None:
         self.view.pack_forget()
         window = tk.Frame(self.root)
@@ -274,8 +292,49 @@ class Window(object):
 
         self.basic_btn_frame(window)
 
+    def build_qr_codes(self) -> None:
+        self.view.pack_forget()
+        window = tk.Frame(self.root)
+        window.pack(expand=True, fill="both")
+        self.view = window
 
-##########################################################################################################################################################################
+        self.set_window_name("Create QR codes")
+
+        content = tk.Frame(window)
+        content.pack()
+
+        self.set_header_title(frame=content, title="Create QR codes")
+
+        sorted_list = self.tools.get_sorted_rooms()
+
+        menu_button = ttk.Menubutton(content, text="Pick one room")
+        name_selected = StringVar()
+
+        drop_down_menu = tk.Menu(content, tearoff=0)
+        property_rules = PropertyRules()
+
+        for item in sorted_list:
+            duplicated = any(item.id_ in duplicate_listing for duplicate_listing in property_rules.duplicate_listing)
+            valid_id = all(item.id_ != duplicate_listing[0] for duplicate_listing in property_rules.duplicate_listing)
+            listing_duplicated = duplicated and valid_id
+
+            if listing_duplicated:
+                continue
+            drop_down_menu.add_radiobutton(label=item.name, value=item, variable=name_selected)
+
+        name_selected.trace("w", lambda *args: menu_button.config(text=name_selected.get().name))
+        menu_button["menu"] = drop_down_menu
+        menu_button.pack(pady=(10, 0), expand=True)
+
+        result_label = tk.Label(content, text="")
+        build_statement_btn = tk.Button(content, text="Create QR",
+                                        command=lambda: self.create_qr(result_label, name_selected))
+        build_statement_btn.pack(pady=20)
+        result_label.pack(side="bottom", pady=(70, 10), anchor="center")
+
+        self.basic_btn_frame(window)
+
+    ##########################################################################################################################################################################
 # XERO
 ##########################################################################################################################################################################
 

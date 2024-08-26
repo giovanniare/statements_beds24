@@ -1,0 +1,82 @@
+{
+    "229544": {
+        "property_name": "Sirenis - Beautiful cozy place steps from the beach",
+        "property_number": null,
+        "country": "MX",
+        "state": "Quintana Roo",
+        "rooms": [
+            {
+                "room_id": 490849,
+                "room_name": "Akumal rest fun and sea. # 1"
+            },
+            {
+                "room_id": 490850,
+                "room_name": "Akumal steps from the beach # 2"
+            },
+            {
+                "room_id": 490852,
+                "room_name": "Akumal Tulum beach and harmony # 3"
+            },
+            {
+                "room_id": 490853,
+                "room_name": "Akumal Tulum beach and rest # 4"
+            },
+            {
+                "room_id": 490854,
+                "room_name": "Akumal Tulum sea and rest # 5"
+            },
+            {
+                "room_id": 490855,
+                "room_name": "Tulum Akumal steps from the beach # 6"
+            },
+            {
+                "room_id": 486797,
+                "room_name": "Tulum/Akumal cozy place steps from the beach # 7"
+            },
+            {
+                "room_id": 490857,
+                "room_name": "Akumal/Tulum cozy place steps from the beach # 8"
+            },
+            {
+                "room_id": 490858,
+                "room_name": "Akumal Tulum cosy place steps from the beach # 9"
+            },
+            {
+                "room_id": 493746,
+                "room_name": "Akumal/Tulum cozy place steps from the beach # 10"
+            },
+            {
+                "room_id": 493021,
+                "room_name": "Akumal rest fun and sea. #11"
+            },
+            {
+                "room_id": 493022,
+                "room_name": "Akumal Tulum beautiful place # 12"
+            },
+            {
+                "room_id": 500206,
+                "room_name": "Sirenis Private Rooftop with jacuzzi & Breakfast #13"
+            },
+            {
+                "room_id": 493035,
+                "room_name": "Akumal rest fun and sea. #14"
+            },
+            {
+                "room_id": 493747,
+                "room_name": "Akumal Tulum steps from the beach #15"
+            },
+            {
+                "room_id": 493039,
+                "room_name": "Akumal Tulum steps from the beach #16"
+            },
+            {
+                "room_id": 493040,
+                "room_name": "Akumal Tulum steps from the beach #17"
+            },
+            {
+                "room_id": 493041,
+                "room_name": "Akumal Tulum steps from the beach # 18"
+            }
+        ]
+    }
+}
