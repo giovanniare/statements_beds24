@@ -49,25 +49,28 @@ class PropertyRules(object):
         properties = self.tools.get_full_properties_data()
         final_commission = {}
 
-        for id_ in properties.keys():
+        for id_, data in properties.items():
+            p_num = data[CS.PROPERTY_NUMBER]
+            name = data[CS.PROPERTY_NAME]
+
             # 25% de comision
-            if id_ in CS.FINAL_COMMISSION_25:
+            if p_num in ["9", "4", "10", "20"]:
                 comsion = 0.25
 
             # 22% de comision
-            elif id_ in CS.FINAL_COMMISSION_22:
+            elif "Amaru" in name:
                 comsion = 0.22
 
             # 20% de comision
-            elif id_ in CS.FINAL_COMMISSION_20:
+            elif p_num in ["15"]:
                 comsion = 0.2
 
             # 18% de comision
-            elif id_ in CS.FINAL_COMMISSION_18:
+            elif p_num in ["14"]:
                 comsion = 0.18
 
             # 10% de comision
-            elif id_ in CS.FINAL_COMMISSION_10:
+            elif p_num in ["2831"]:
                 comsion = 0.1
 
             else:
