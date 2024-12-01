@@ -194,7 +194,18 @@ class BedsHandler(GenericHandler):
         if not api_response or not_success:
             return False
 
-        return api_response["data"]
+        bookings = api_response["data"]
+        more_bookings = api_response["pages"]["nextPageExists"]
+        if more_bookings:
+            new_page = api_response["pages"]["nextPageLink"]
+            while more_bookings:
+                new_response = self.api.get_request(url=new_page, headers=header)
+                bookings.extend(new_response["data"])
+                more_bookings = new_response["pages"]["nextPageExists"]
+                new_page = new_response["pages"]["nextPageLink"]
+
+
+        return bookings
 
     def get_room_bookings(self, property_id, arrival_from=None, arrival_to=None, room=None) -> dict:
         """
