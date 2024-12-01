@@ -71,6 +71,16 @@ XERO_TOKEN_FILE = {
 PASS_COLOR = "#27A243"
 
 SIRENIS_ID = "229544"
+# RB9, RB4, RB10, AMARU20, AMARU21
+FINAL_COMMISSION_25 = ["252411", "229975", "132595", "180972", "143528"]
+# AMARU1
+FINAL_COMMISSION_22 = ["208492"]
+# 15, ALDEA ZAMA
+FINAL_COMMISSION_20 = ["132599", "252780"]
+# 14
+FINAL_COMMISSION_18 = []
+# 2831
+FINAL_COMMISSION_10 = ["236692"]
 
 ##########################################################################################
 # Numeric consts
