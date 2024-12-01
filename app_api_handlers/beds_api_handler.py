@@ -204,7 +204,6 @@ class BedsHandler(GenericHandler):
                 more_bookings = new_response["pages"]["nextPageExists"]
                 new_page = new_response["pages"]["nextPageLink"]
 
-
         return bookings
 
     def get_room_bookings(self, property_id, arrival_from=None, arrival_to=None, room=None) -> dict:
