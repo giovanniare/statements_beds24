@@ -261,7 +261,7 @@ class Tools(object):
                 duplicated_dict[property_number] = [id_]
                 continue
 
-            if  id_ == 180972 or id_ == 252780:
+            if  id_ == "180972" or id_ == "252780":
                 continue
 
             duplicated_dict[property_number].append(id_)
