@@ -66,6 +66,14 @@ class PropertyRules(object):
             elif id_ in CS.FINAL_COMMISSION_18:
                 comsion = 0.18
 
+            # 15% de comision
+            elif id_ in CS.FINAL_COMMISSION_15:
+                comsion = 0.15
+
+            # 12% de comision
+            elif id_ in CS.FINAL_COMMISSION_12:
+                comsion = 0.12
+
             # 10% de comision
             elif id_ in CS.FINAL_COMMISSION_10:
                 comsion = 0.1
