@@ -15,7 +15,7 @@ class PropertyRules(object):
 
         for id_, data in properties.items():
             p_num = data[CS.PROPERTY_NUMBER]
-            if p_num in ["10", "9", "4"]:
+            if id_ in ["143528", "132595", "180972"]:
                rule = self.rule_rb_10_9_4
 
             elif p_num in ["2238"]:
@@ -23,6 +23,7 @@ class PropertyRules(object):
 
             elif p_num in ["3208"]:
                 rule = self.rule_3208
+
             elif id_ == CS.SIRENIS_ID:
                 rule = self.rule_sirenis
             else:

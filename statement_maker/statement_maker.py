@@ -181,8 +181,8 @@ class StatementMaker(object):
             if booking[3] == "TOTAL RENTAS":
                 continue
 
-            data[0].append(int(round(float(booking[3][2:-1]), 2)))
-            data[1].append(int(round(float(booking[4][2:-1]), 2)))
+            data[0].append(int(round(float(booking[3][2:]), 2)))
+            data[1].append(int(round(float(booking[4][2:]), 2)))
             names.append(booking[0])
 
         data[0] = tuple(data[0])
