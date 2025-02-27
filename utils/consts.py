@@ -80,11 +80,13 @@ FINAL_COMMISSION_20 = ["132599", "252780", "255160"]
 # 14
 FINAL_COMMISSION_18 = []
 # AK-TCC
-FINAL_COMMISSION_15 = ["257028"]
+FINAL_COMMISSION_15 = ["257028", "170694"]
 # Caribean-Cove
 FINAL_COMMISSION_12 = ["257286"]
 # 2831, PH-RT, Veleta-Cozy, Veleta-Studio
 FINAL_COMMISSION_10 = ["236692", "255880", "256098", "256099"]
+
+EXTRA_QR_PROPERTIES = ["261057", "259756"]
 
 ##########################################################################################
 # Numeric consts
