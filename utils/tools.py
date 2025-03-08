@@ -291,6 +291,22 @@ class Tools(object):
             property_list.append(menu_item)
 
         return property_list
+    
+    def get_non_sirenes_properties_for_qr(self):
+        properties = self.get_full_properties_data()
+        reverse_property_dict = {}
+        property_list = []
+
+        for id_ in CS.EXTRA_QR_PROPERTIES:
+            data = properties[id_]
+            reverse_property_dict[data["property_name"]] = id_
+
+        sorted_dict = sorted(reverse_property_dict)
+        for name in sorted_dict:
+            menu_item = reverse_property_tuple(name, reverse_property_dict[name])
+            property_list.append(menu_item)
+
+        return property_list
 
     def get_sorted_rooms(self):
         properties = self.get_full_sirenis_properties_data()

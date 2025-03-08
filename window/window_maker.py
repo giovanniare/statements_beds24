@@ -306,6 +306,8 @@ class Window(object):
         self.set_header_title(frame=content, title="Create QR codes")
 
         sorted_list = self.tools.get_sorted_rooms()
+        extra_properties = self.tools.get_non_sirenes_properties_for_qr()
+        sorted_list.extend(extra_properties)
 
         menu_button = ttk.Menubutton(content, text="Pick one room")
         name_selected = StringVar()

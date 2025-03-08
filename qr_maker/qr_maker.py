@@ -3,7 +3,7 @@ import re
 import qrcode
 from app_api_handlers.beds_api_handler import BedsHandler
 from datetime import datetime
-from utils.consts import DASH, SIRENIS_ID, WHATSAPP_NUMBER
+from utils.consts import DASH, SIRENIS_ID, WHATSAPP_NUMBER, EXTRA_QR_PROPERTIES
 from utils.exceptions import UnexpectedError
 from utils.tools import Tools
 from utils.logger import Logger
@@ -22,10 +22,15 @@ class QrMaker(object):
         self.date_to = report_dates.To
 
     def generate_qrs(self, room_id, room_name):
-        folder_obj = FolderObj(self.date_from, self.date_to, room_name)
-        folder_obj.build()
+        if room_id in EXTRA_QR_PROPERTIES:
+            bookings_dict = self.beds_handler.get_property_bookings(room_id, arrival_from=self.date_from, arrival_to=self.date_to)
+            name = room_id
+        else:
+            bookings_dict = self.beds_handler.get_room_bookings(SIRENIS_ID, arrival_from=self.date_from, arrival_to=self.date_to, room=room_id)
+            name = room_name
 
-        bookings_dict = self.beds_handler.get_room_bookings(SIRENIS_ID, arrival_from=self.date_from, arrival_to=self.date_to, room=room_id)
+        folder_obj = FolderObj(self.date_from, self.date_to, name)
+        folder_obj.build()
 
         bookings_list = list()
         for booking in bookings_dict:
@@ -36,7 +41,7 @@ class QrMaker(object):
         try:
             for booking in bookings_list:
                 qr_obj = QRCreator()
-                qr_obj.populate(booking, folder_obj.room_path, room_name)
+                qr_obj.populate(booking, folder_obj.room_path, name)
                 qr_obj.build()
         except Exception as e:
             msg = f"An Error Occours over {room_id} - {room_name}: \n{e}"
