@@ -18,8 +18,8 @@ class PropertyRules(object):
             if id_ in ["143528", "132595", "180972"]:
                rule = self.rule_rb_10_9_4
 
-            elif p_num in ["2238"]:
-                rule = self.rule_2238
+            if id_ in CS.PROPERTY_PET_FEE_EXEMPT or p_num in ["2238"]:
+                rule = self.no_pet_fee_rule
 
             elif p_num in ["3208"]:
                 rule = self.rule_3208
@@ -163,10 +163,7 @@ class PropertyRules(object):
 
         return self.booking_from_airbnb(charges, income)
 
-    def rule_2238(self, charges, income, booking_from_beds=False) -> int:
-        """
-        Pet fee don't apply as charge and if booking is coming from beds, 3% don't apply neither for property 2238
-        """
+    def no_pet_fee_rule(self, charges, income, booking_from_beds=False) -> int:
         if CS.PET_FEE_KEY in charges:
             charges.pop(CS.PET_FEE_KEY)
 
