@@ -91,13 +91,6 @@ FINAL_COMMISSION_10 = ["236692", "255880", "256098", "256099", "311221"]
 
 EXTRA_QR_PROPERTIES = ["261057", "259756"]
 
-# Listings that are actually the same property and share a single statement.
-# The first id of each group gives the statement name.
-GROUPED_PROPERTIES = [
-    # Casa Yaakun
-    ("359723", "358710", "358711", "358712", "361856", "361858"),
-]
-
 PROPERTY_PET_FEE_EXEMPT =["287061", "302787", "306209"]
 
 ##########################################################################################

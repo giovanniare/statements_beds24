@@ -250,12 +250,8 @@ class Tools(object):
     def get_duplicate_properties(self):
         properties = self.get_full_properties_data()
 
-        grouped_ids = [id_ for group in CS.GROUPED_PROPERTIES for id_ in group]
-
         duplicated_dict = {}
         for id_, data in properties.items():
-            if id_ in grouped_ids:
-                continue
 
             property_number = data[CS.PROPERTY_NUMBER]
             if property_number is None:
@@ -271,7 +267,6 @@ class Tools(object):
             duplicated_dict[property_number].append(id_)
 
         duplicate_listing = [tuple(id_list) for id_list in duplicated_dict.values() if len(id_list) > 1]
-        duplicate_listing.extend(CS.GROUPED_PROPERTIES)
         return duplicate_listing
 
     def get_property_info(self, propery_id):
