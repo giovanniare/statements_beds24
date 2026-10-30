@@ -71,8 +71,11 @@ XERO_TOKEN_FILE = {
 PASS_COLOR = "#27A243"
 
 SIRENIS_ID = "229544"
-# RB9, RB4, RB10, AMARU20, AMARU21, AMARU13
-FINAL_COMMISSION_25 = ["252411", "229975", "132595", "180972", "143528", "208492", "265282", "305088", "290322"]
+# RB9, RB4, RB10, AMARU20, AMARU21, AMARU13, Casa Yaakun
+FINAL_COMMISSION_25 = [
+    "252411", "229975", "132595", "180972", "143528", "208492", "265282", "305088", "290322",
+    "359723", "358710", "358711", "358712", "361856", "361858"
+]
 # None now
 FINAL_COMMISSION_22 = []
 # 15, ALDEA ZAMA, Playacar8
@@ -88,7 +91,14 @@ FINAL_COMMISSION_10 = ["236692", "255880", "256098", "256099", "311221"]
 
 EXTRA_QR_PROPERTIES = ["261057", "259756"]
 
-PROPERTY_PET_FEE_EXEMPT = ["287061", "302787", "306209"]
+# Listings that are actually the same property and share a single statement.
+# The first id of each group gives the statement name.
+GROUPED_PROPERTIES = [
+    # Casa Yaakun
+    ("359723", "358710", "358711", "358712", "361856", "361858"),
+]
+
+PROPERTY_PET_FEE_EXEMPT =["287061", "302787", "306209"]
 
 ##########################################################################################
 # Numeric consts
